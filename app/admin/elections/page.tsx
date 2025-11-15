@@ -24,9 +24,9 @@ export default function AdminElectionsPage() {
     majoritarianDistricts: Array.from({ length: 10 }, (_, i) => ({
       districtNumber: i + 1,
       candidateId: null as number | null,
-      candidateName: "" as string,
+      candidateName: null as string | null,
       partyId: null as number | null,
-      partyName: "" as string,
+      partyName: null as string | null,
     })),
   });
 
@@ -46,14 +46,18 @@ export default function AdminElectionsPage() {
     if (elections) {
       if (elections.parliament) {
         // Забезпечуємо, що завжди є рівно 10 округів
-        const districts = [...elections.parliament.majoritarianDistricts];
+        const districts = [...elections.parliament.majoritarianDistricts].map((d) => ({
+          ...d,
+          candidateName: d.candidateName || null,
+          partyName: d.partyName || null,
+        }));
         while (districts.length < 10) {
           districts.push({
             districtNumber: districts.length + 1,
             candidateId: null,
-            candidateName: "",
+            candidateName: null,
             partyId: null,
-            partyName: "",
+            partyName: null,
           });
         }
         // Обмежуємо до 10, якщо більше
@@ -72,9 +76,9 @@ export default function AdminElectionsPage() {
           majoritarianDistricts: Array.from({ length: 10 }, (_, i) => ({
             districtNumber: i + 1,
             candidateId: null,
-            candidateName: "",
+            candidateName: null,
             partyId: null,
-            partyName: "",
+            partyName: null,
           })),
         });
       }
@@ -226,14 +230,14 @@ export default function AdminElectionsPage() {
       newDistricts[districtIndex] = {
         ...newDistricts[districtIndex],
         candidateId: value ? parseInt(value) : null,
-        candidateName: politician?.name || "",
+        candidateName: politician?.name || null,
       };
     } else if (field === "partyId") {
       const party = parties.find((p) => p.id === parseInt(value));
       newDistricts[districtIndex] = {
         ...newDistricts[districtIndex],
         partyId: value ? parseInt(value) : null,
-        partyName: party?.name || "",
+        partyName: party?.name || null,
       };
     } else {
       newDistricts[districtIndex] = { ...newDistricts[districtIndex], [field]: value };
