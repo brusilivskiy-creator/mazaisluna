@@ -25,7 +25,7 @@ export function ParliamentSection() {
 
   if (loading) {
     return (
-      <section className="py-12 md:py-16 h-full flex flex-col">
+      <section className="h-full flex flex-col">
         <div className="flex-1 flex flex-col">
           <p style={{ fontFamily: "var(--font-proba)" }}>Завантаження...</p>
         </div>
@@ -34,7 +34,7 @@ export function ParliamentSection() {
   }
 
   return (
-    <section className="py-12 md:py-16 h-full flex flex-col">
+    <section className="h-full flex flex-col">
       <div className="flex-1 flex flex-col">
         <h2
           className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-4 md:mb-6 text-left pb-3 border-b border-gray-300"

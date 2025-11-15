@@ -2,8 +2,10 @@
 
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
-import { Users, Settings, FileText, Building2 } from "lucide-react";
+import { Users, Settings, FileText, Building2, LogOut, Vote } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const adminSections = [
   {
@@ -42,6 +44,13 @@ const adminSections = [
     color: "bg-purple-500",
   },
   {
+    href: "/admin/elections",
+    label: "Вибори",
+    description: "Управління результатами виборів",
+    icon: Vote,
+    color: "bg-yellow-500",
+  },
+  {
     href: "/admin/news",
     label: "Новини",
     description: "Управління новинами та публікаціями",
@@ -58,26 +67,48 @@ const adminSections = [
 ];
 
 export default function AdminPage() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/admin/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   return (
-    <>
+    <AuthGuard>
       <Header />
       <div className="page-wrapper">
         <main className="bg-white min-h-screen w-full">
           <div className="min-h-screen bg-gray-50 py-12">
             <div className="content-wrapper">
-              <div className="mb-8">
-                <h1
-                  className="text-3xl md:text-4xl font-semibold text-gray-900 mb-2"
+              <div className="mb-8 flex justify-between items-start">
+                <div>
+                  <h1
+                    className="text-3xl md:text-4xl font-semibold text-gray-900 mb-2"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    Адмін-панель
+                  </h1>
+                  <p
+                    className="text-gray-600"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    Управління контентом сайту
+                  </p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                   style={{ fontFamily: "var(--font-proba)" }}
                 >
-                  Адмін-панель
-                </h1>
-                <p
-                  className="text-gray-600"
-                  style={{ fontFamily: "var(--font-proba)" }}
-                >
-                  Управління контентом сайту
-                </p>
+                  <LogOut className="w-4 h-4" />
+                  Вийти
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,7 +144,7 @@ export default function AdminPage() {
         </main>
       </div>
       <Footer />
-    </>
+    </AuthGuard>
   );
 }
 

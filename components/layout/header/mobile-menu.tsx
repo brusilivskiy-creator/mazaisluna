@@ -6,12 +6,10 @@ import Link from "next/link";
 
 const navLinks = [
   { href: "/", label: "Головна" },
-  { href: "/about", label: "Про нас" },
   { href: "/constitution", label: "Конституція" },
   { href: "/government", label: "Керівництво" },
   { href: "/parliament", label: "Парламент" },
-  { href: "/news", label: "Новини" },
-  { href: "/decrees", label: "Укази" },
+  { href: "/elections", label: "Вибори" },
 ];
 
 export function MobileMenu() {

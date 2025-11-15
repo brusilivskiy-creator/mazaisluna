@@ -103,5 +103,33 @@
     "party": "Консервативна партія Мезайс Луни",
     "partyLogo": "/images/political-parties/cons.png",
     "id": 15
+  },
+  {
+    "name": "Ольга Чеботар",
+    "image": "/images/people/1763242539316_Instagram_post_-_121.png",
+    "party": null,
+    "partyLogo": null,
+    "id": 16
+  },
+  {
+    "name": "Віктор Медведчук",
+    "image": "/images/people/1763242863339_Instagram_post_-_122.png",
+    "party": "Депутатська група «Перемога»",
+    "partyLogo": "/images/political-parties/vic.png",
+    "id": 17
+  },
+  {
+    "name": "Юрій Косюк",
+    "image": "/images/people/1763243198964_Instagram_post_-_123.png",
+    "party": "Незалежність",
+    "partyLogo": "/images/political-parties/nz.png",
+    "id": 18
+  },
+  {
+    "name": "Олександр Вілкул",
+    "image": "/images/people/1763243306601_Instagram_post_-_123__1_.png",
+    "party": null,
+    "partyLogo": null,
+    "id": 19
   }
 ]

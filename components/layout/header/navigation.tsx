@@ -3,12 +3,11 @@ import { Search } from "lucide-react";
 import { Facebook, Twitter, Youtube } from "lucide-react";
 
 const navLinks = [
+  { href: "/", label: "Головна" },
+  { href: "/constitution", label: "Конституція" },
   { href: "/government", label: "Керівництво" },
-  { href: "/services", label: "Послуги" },
-  { href: "/activities", label: "Діяльність" },
-  { href: "/decisions", label: "Рішення Уряду" },
-  { href: "/public", label: "Для громадськості" },
-  { href: "/press", label: "Прес-центр" },
+  { href: "/parliament", label: "Парламент" },
+  { href: "/elections", label: "Вибори" },
 ];
 
 export function Navigation() {

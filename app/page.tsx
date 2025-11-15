@@ -11,16 +11,18 @@ export default function Home() {
       <div className="page-wrapper">
         <main className="bg-white min-h-screen w-full">
           <AdvantagesSection />
-          <div className="content-wrapper">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
-              <div className="lg:order-1 flex flex-col">
-                <LeadershipSection />
-              </div>
-              <div className="lg:order-2 flex flex-col">
-                <ParliamentSection />
+          <section className="py-12 md:py-16">
+            <div className="content-wrapper">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
+                <div className="lg:order-1 flex flex-col h-full">
+                  <LeadershipSection />
+                </div>
+                <div className="lg:order-2 flex flex-col h-full">
+                  <ParliamentSection />
+                </div>
               </div>
             </div>
-          </div>
+          </section>
         </main>
       </div>
       <Footer />

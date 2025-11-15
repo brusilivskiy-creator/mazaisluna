@@ -5,6 +5,7 @@ import { Politician } from "@/lib/politicians";
 import { Party } from "@/lib/parties";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -185,18 +186,18 @@ export default function AdminPoliticiansPage() {
 
   if (loading) {
     return (
-      <>
+      <AuthGuard>
         <Header />
         <div className="min-h-screen flex items-center justify-center">
           <p style={{ fontFamily: "var(--font-proba)" }}>Завантаження...</p>
         </div>
         <Footer />
-      </>
+      </AuthGuard>
     );
   }
 
   return (
-    <>
+    <AuthGuard>
       <Header />
       <div className="page-wrapper">
         <main className="bg-white min-h-screen w-full">
@@ -406,7 +407,7 @@ export default function AdminPoliticiansPage() {
         </main>
       </div>
       <Footer />
-    </>
+    </AuthGuard>
   );
 }
 

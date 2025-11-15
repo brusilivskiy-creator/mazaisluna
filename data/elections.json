@@ -1,0 +1,131 @@
+{
+  "parliament": {
+    "id": 1,
+    "date": "2025-11-10",
+    "parties": [
+      {
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс",
+        "percentage": 44.3
+      },
+      {
+        "partyId": 2,
+        "partyName": "Незалежність",
+        "percentage": 27.7
+      },
+      {
+        "partyId": 3,
+        "partyName": "Альтернатива для Мезайсу",
+        "percentage": 13.3
+      },
+      {
+        "partyId": 4,
+        "partyName": "Депутатська група «Перемога»",
+        "percentage": 10.1
+      },
+      {
+        "partyId": 5,
+        "partyName": "Батьківщина",
+        "percentage": 4.58
+      }
+    ],
+    "majoritarianDistricts": [
+      {
+        "districtNumber": 1,
+        "candidateId": 12,
+        "candidateName": "Майя Санду",
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс"
+      },
+      {
+        "districtNumber": 2,
+        "candidateId": 16,
+        "candidateName": "Ольга Чеботар",
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс"
+      },
+      {
+        "districtNumber": 3,
+        "candidateId": 14,
+        "candidateName": "Віктор Пилипишин",
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс"
+      },
+      {
+        "districtNumber": 4,
+        "candidateId": 18,
+        "candidateName": "Юрій Косюк",
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс"
+      },
+      {
+        "districtNumber": 5,
+        "candidateId": 17,
+        "candidateName": "Віктор Медведчук",
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс"
+      },
+      {
+        "districtNumber": 6,
+        "candidateId": 19,
+        "candidateName": "Олександр Вілкул",
+        "partyId": 1,
+        "partyName": "Патріотичний Альянс"
+      },
+      {
+        "districtNumber": 7,
+        "candidateId": 11,
+        "candidateName": "Ігор Смешко",
+        "partyId": 2,
+        "partyName": "Незалежність"
+      },
+      {
+        "districtNumber": 8,
+        "candidateId": 7,
+        "candidateName": "Михайло Поплавський",
+        "partyId": 2,
+        "partyName": "Незалежність"
+      },
+      {
+        "districtNumber": 9,
+        "candidateId": 15,
+        "candidateName": "Олексій Гончарук",
+        "partyId": 2,
+        "partyName": "Незалежність"
+      },
+      {
+        "districtNumber": 10,
+        "candidateId": 9,
+        "candidateName": "Дмитро Корчинський",
+        "partyId": 2,
+        "partyName": "Незалежність"
+      }
+    ]
+  },
+  "leader": {
+    "id": 1,
+    "date": "2025-11-09",
+    "candidates": [
+      {
+        "candidateId": 4,
+        "candidateName": "Фелікс Зіммерман",
+        "percentage": 61.8
+      },
+      {
+        "candidateId": 12,
+        "candidateName": "Майя Санду",
+        "percentage": 17.6
+      },
+      {
+        "candidateId": 11,
+        "candidateName": "Ігор Смешко",
+        "percentage": 8.8
+      },
+      {
+        "candidateId": 19,
+        "candidateName": "Олександр Вілкул",
+        "percentage": 8.8
+      }
+    ]
+  }
+}

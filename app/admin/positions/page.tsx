@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Position } from "@/lib/positions";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
 import { GripVertical } from "lucide-react";
 
@@ -176,18 +177,18 @@ export default function AdminPositionsPage() {
 
   if (loading) {
     return (
-      <>
+      <AuthGuard>
         <Header />
         <div className="min-h-screen flex items-center justify-center">
           <p style={{ fontFamily: "var(--font-proba)" }}>Завантаження...</p>
         </div>
         <Footer />
-      </>
+      </AuthGuard>
     );
   }
 
   return (
-    <>
+    <AuthGuard>
       <Header />
       <div className="page-wrapper">
         <main className="bg-white min-h-screen w-full">
@@ -357,7 +358,7 @@ export default function AdminPositionsPage() {
         </main>
       </div>
       <Footer />
-    </>
+    </AuthGuard>
   );
 }
 
