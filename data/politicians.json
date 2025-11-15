@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Вікторія Коваленко",
+    "image": "/images/people/1763233589185_Instagram_post_-_29.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 1
+  },
+  {
+    "name": "Олег Тягнибок",
+    "image": "/images/people/1763233635828_Instagram_post_-_10.png",
+    "party": "Незалежність",
+    "partyLogo": "/images/political-parties/nz.png",
+    "id": 2
+  },
+  {
+    "name": "Олег Ляшко",
+    "image": "/images/people/1763233676786_liashko.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 3
+  },
+  {
+    "name": "Фелікс Зіммерман",
+    "image": "/images/people/1763233693948_zimmeman.png",
+    "party": "Альтернатива для Мезайсу",
+    "partyLogo": "/images/political-parties/alt.png",
+    "id": 4
+  },
+  {
+    "name": "Сергій Льовочкін",
+    "image": "/images/people/1763234059862_Instagram_post_-_30.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 5
+  },
+  {
+    "name": "Володимир Литвин",
+    "image": "/images/people/1763234419572_Instagram_post_-_114.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 6
+  },
+  {
+    "name": "Михайло Поплавський",
+    "image": "/images/people/1763234755348_Instagram_post_-_89.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 7
+  },
+  {
+    "name": "Юрій Михальчишин",
+    "image": "/images/people/1763234801285_Instagram_post_-_57__1_.png",
+    "party": "Незалежність",
+    "partyLogo": "/images/political-parties/nz.png",
+    "id": 8
+  },
+  {
+    "name": "Дмитро Корчинський",
+    "image": "/images/people/1763234822671_Instagram_post_-_91.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 9
+  },
+  {
+    "name": "Віталій Кім",
+    "image": "/images/people/1763235243204_Instagram_post_-_115.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 10
+  },
+  {
+    "name": "Ігор Смешко",
+    "image": "/images/people/1763235422330_Instagram_post_-_116.png",
+    "party": "Консервативна партія",
+    "partyLogo": "/images/political-parties/cons.png",
+    "id": 11
+  },
+  {
+    "name": "Майя Санду",
+    "image": "/images/people/1763235609950_Instagram_post_-_117.png",
+    "party": "Дія та Солідарність",
+    "partyLogo": "/images/political-parties/1763233254063_Instagram_post_-_37__2_.png",
+    "id": 12
+  },
+  {
+    "name": "Олександр Жукотанський",
+    "image": "/images/people/1763235769027_Instagram_post_-_118.png",
+    "party": "Патріотичний Альянс",
+    "partyLogo": "/images/political-parties/pa.png",
+    "id": 13
+  },
+  {
+    "name": "Віктор Пилипишин",
+    "image": "/images/people/1763236049430_Instagram_post_-_119.png",
+    "party": "Льорнети Передусім",
+    "partyLogo": "/images/political-parties/1763236187574_Instagram_post_-_115__1_.png",
+    "id": 14
+  },
+  {
+    "name": "Олексій Гончарук",
+    "image": "/images/people/1763236300549_Instagram_post_-_120.png",
+    "party": "Консервативна партія Мезайс Луни",
+    "partyLogo": "/images/political-parties/cons.png",
+    "id": 15
+  }
+]

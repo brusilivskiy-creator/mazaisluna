@@ -1,0 +1,154 @@
+<svg width="800" height="450" viewBox="0 0 800 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <!-- Градієнти для 3D ефекту -->
+  <radialGradient id="yellowGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#FFE066" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#FFC31A" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#E6B000" stop-opacity="1"/>
+  </radialGradient>
+  
+  <radialGradient id="darkBlueGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#2A4A9E" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#193282" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#0F1F5A" stop-opacity="1"/>
+  </radialGradient>
+  
+  <radialGradient id="tealGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#00C4B3" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#00A090" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#007D6E" stop-opacity="1"/>
+  </radialGradient>
+  
+  <radialGradient id="redGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#FF1A1A" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#D90000" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#B30000" stop-opacity="1"/>
+  </radialGradient>
+  
+  <radialGradient id="pinkGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#FF5C7A" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#FF3156" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#E61E42" stop-opacity="1"/>
+  </radialGradient>
+  
+  <radialGradient id="grayGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#B8B8B8" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#9D9D9D" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#7A7A7A" stop-opacity="1"/>
+  </radialGradient>
+  
+  <radialGradient id="conservativeGradient" cx="30%" cy="30%">
+    <stop offset="0%" stop-color="#FFB84D" stop-opacity="1"/>
+    <stop offset="70%" stop-color="#FF9900" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#CC7700" stop-opacity="1"/>
+  </radialGradient>
+  
+  <!-- Фільтр для тіні -->
+  <filter id="shadow3d" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+    <feOffset dx="2" dy="2" result="offsetblur"/>
+    <feComponentTransfer>
+      <feFuncA type="linear" slope="0.3"/>
+    </feComponentTransfer>
+    <feMerge>
+      <feMergeNode/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</defs>
+
+<!-- Патріотичний Альянс - 29 мандатів (жовтий) -->
+<!-- Нижній ряд півкола (15 кружечків) -->
+<circle cx="42" cy="388" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="96" cy="395" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="150" cy="399" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="204" cy="400" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="258" cy="399" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="312" cy="395" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="366" cy="388" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="420" cy="378" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="474" cy="365" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="528" cy="349" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="582" cy="330" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="636" cy="308" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="690" cy="283" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="744" cy="255" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="798" cy="224" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<!-- Другий ряд (9 кружечків) -->
+<circle cx="69" cy="355" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="123" cy="361" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="177" cy="364" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="231" cy="364" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="285" cy="361" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="393" cy="352" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="447" cy="340" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="501" cy="325" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="555" cy="307" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<!-- Третій ряд (3 кружечки) -->
+<circle cx="96" cy="322" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="204" cy="327" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="312" cy="328" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<!-- Четвертий ряд (2 кружечки) -->
+<circle cx="150" cy="289" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+<circle cx="258" cy="292" r="17" fill="url(#yellowGradient)" filter="url(#shadow3d)"/>
+
+<!-- Незалежність - 17 мандатів (темно-синій) -->
+<circle cx="609" cy="286" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="663" cy="261" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="717" cy="233" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<!-- Другий ряд -->
+<circle cx="435" cy="315" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="489" cy="300" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="543" cy="283" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="597" cy="263" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="651" cy="240" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="705" cy="214" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<!-- Третій ряд -->
+<circle cx="363" cy="280" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="471" cy="275" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="579" cy="260" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="687" cy="236" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<!-- Четвертий ряд -->
+<circle cx="417" cy="245" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="525" cy="237" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="633" cy="217" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<!-- П'ятий ряд -->
+<circle cx="471" cy="210" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<circle cx="579" cy="194" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+<!-- Шостий ряд -->
+<circle cx="525" cy="170" r="17" fill="url(#darkBlueGradient)" filter="url(#shadow3d)"/>
+
+<!-- Альтернатива для Мезайсу - 8 мандатів (бірюзовий) -->
+<circle cx="123" cy="289" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="177" cy="289" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="231" cy="287" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="285" cy="282" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="339" cy="274" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="393" cy="263" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="447" cy="249" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+<circle cx="501" cy="232" r="17" fill="url(#tealGradient)" filter="url(#shadow3d)"/>
+
+<!-- Депутатська група Перемога - 7 мандатів (червоний) -->
+<circle cx="150" cy="256" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+<circle cx="204" cy="253" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+<circle cx="258" cy="248" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+<circle cx="312" cy="240" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+<circle cx="366" cy="229" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+<circle cx="420" cy="215" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+<circle cx="474" cy="198" r="17" fill="url(#redGradient)" filter="url(#shadow3d)"/>
+
+<!-- Позафракційні - 4 мандати (сірий) -->
+<circle cx="177" cy="223" r="17" fill="url(#grayGradient)" filter="url(#shadow3d)"/>
+<circle cx="231" cy="218" r="17" fill="url(#grayGradient)" filter="url(#shadow3d)"/>
+<circle cx="285" cy="210" r="17" fill="url(#grayGradient)" filter="url(#shadow3d)"/>
+<circle cx="339" cy="199" r="17" fill="url(#grayGradient)" filter="url(#shadow3d)"/>
+
+<!-- Батьківщина - 3 мандати (рожевий) -->
+<circle cx="204" cy="190" r="17" fill="url(#pinkGradient)" filter="url(#shadow3d)"/>
+<circle cx="258" cy="182" r="17" fill="url(#pinkGradient)" filter="url(#shadow3d)"/>
+<circle cx="312" cy="171" r="17" fill="url(#pinkGradient)" filter="url(#shadow3d)"/>
+
+<!-- Консервативна партія - 2 мандати (помаранчевий) -->
+<circle cx="231" cy="157" r="17" fill="url(#conservativeGradient)" filter="url(#shadow3d)"/>
+<circle cx="285" cy="148" r="17" fill="url(#conservativeGradient)" filter="url(#shadow3d)"/>
+</svg>

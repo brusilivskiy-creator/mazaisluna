@@ -1,0 +1,61 @@
+[
+  {
+    "id": 1,
+    "name": "Патріотичний Альянс",
+    "logo": "/images/political-parties/pa.png",
+    "seats": 29
+  },
+  {
+    "id": 2,
+    "name": "Незалежність",
+    "logo": "/images/political-parties/nz.png",
+    "seats": 17
+  },
+  {
+    "id": 3,
+    "name": "Альтернатива для Мезайсу",
+    "logo": "/images/political-parties/alt.png",
+    "seats": 8
+  },
+  {
+    "name": "Депутатська група Перемога",
+    "logo": "/images/political-parties/vic.png",
+    "seats": 7,
+    "note": "Інший Мезайс (3), S.O.S. Мезайс (3), позафракційний (1)",
+    "id": 4
+  },
+  {
+    "id": 5,
+    "name": "Батьківщина",
+    "logo": "/images/political-parties/bat.png",
+    "seats": 3
+  },
+  {
+    "name": "Консервативна партія Мезайс Луни",
+    "logo": "/images/political-parties/cons.png",
+    "seats": 2,
+    "note": null,
+    "id": 6
+  },
+  {
+    "name": "Позафракційні",
+    "logo": "/images/political-parties/alt.png",
+    "seats": 1,
+    "note": null,
+    "id": 7
+  },
+  {
+    "name": "Дія та Солідарність",
+    "logo": "/images/political-parties/1763233254063_Instagram_post_-_37__2_.png",
+    "seats": 1,
+    "note": null,
+    "id": 8
+  },
+  {
+    "name": "Льорнети Передусім",
+    "logo": "/images/political-parties/1763236187574_Instagram_post_-_115__1_.png",
+    "seats": 1,
+    "note": null,
+    "id": 9
+  }
+]

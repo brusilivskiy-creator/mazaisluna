@@ -1,0 +1,77 @@
+[
+  {
+    "politicianId": 4,
+    "position": "Провідник",
+    "id": 1
+  },
+  {
+    "politicianId": 2,
+    "position": "Міністр закордонних справ",
+    "id": 2
+  },
+  {
+    "politicianId": 1,
+    "position": "Міністр економіки",
+    "id": 3
+  },
+  {
+    "politicianId": 3,
+    "position": "Прем'єр-міністр",
+    "id": 4
+  },
+  {
+    "politicianId": 5,
+    "position": "Перший віце-прем'єр міністр",
+    "id": 5
+  },
+  {
+    "politicianId": 6,
+    "position": "Міністр освіти та науки",
+    "id": 6
+  },
+  {
+    "politicianId": 7,
+    "position": "Міністр культури",
+    "id": 7
+  },
+  {
+    "politicianId": 8,
+    "position": "Голова Інституту національної пам'яті",
+    "id": 8
+  },
+  {
+    "politicianId": 9,
+    "position": "Міністр оборони",
+    "id": 9
+  },
+  {
+    "politicianId": 10,
+    "position": "Міністр енергетики",
+    "id": 10
+  },
+  {
+    "politicianId": 11,
+    "position": "Голова Служби безпеки Мезайс Луни",
+    "id": 11
+  },
+  {
+    "politicianId": 12,
+    "position": "Міністр інформаційної політики",
+    "id": 12
+  },
+  {
+    "politicianId": 13,
+    "position": "Віце прем'єр міністр з питань аграрно-промислового комплексу",
+    "id": 13
+  },
+  {
+    "politicianId": 14,
+    "position": "Віце прем'єр міністр з питань місцевого самоврядування",
+    "id": 14
+  },
+  {
+    "politicianId": 15,
+    "position": "Міністр охорони здоров'я",
+    "id": 15
+  }
+]
