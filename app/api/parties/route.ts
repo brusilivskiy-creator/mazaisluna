@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const newParty = addParty({
       name,
       logo: logo || "/images/political-parties/alt.png",
-      seats: parseInt(seats) || 0,
+      seats: typeof seats === "number" ? seats : parseInt(String(seats)) || 0,
       note: note || null,
     });
 
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
     const updated = updateParty(id, {
       name,
       logo: logo || "/images/political-parties/alt.png",
-      seats: parseInt(seats) || 0,
+      seats: typeof seats === "number" ? seats : parseInt(String(seats)) || 0,
       note: note || null,
     });
 

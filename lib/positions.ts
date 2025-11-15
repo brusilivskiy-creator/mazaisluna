@@ -36,7 +36,7 @@ export function getPositionById(id: number): Position | undefined {
   return positions.find((p) => p.id === id);
 }
 
-export function addPosition(position: Omit<Position, "id">): Position {
+export function addPosition(position: Omit<Position, "id" | "order"> & { order?: number }): Position {
   const positions = getAllPositions();
   const newId = positions.length > 0 ? Math.max(...positions.map((p) => p.id)) + 1 : 1;
   // Якщо порядок не вказано, додаємо в кінець

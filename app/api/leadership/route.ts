@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     const newPerson = addLeadership({
-      politicianId: politicianId ? parseInt(politicianId) : null,
+      politicianId: politicianId ? (typeof politicianId === "number" ? politicianId : parseInt(String(politicianId))) : null,
       position,
     });
 
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const updated = updateLeadership(id, {
-      politicianId: politicianId ? parseInt(politicianId) : null,
+      politicianId: politicianId ? (typeof politicianId === "number" ? politicianId : parseInt(String(politicianId))) : null,
       position,
     });
 

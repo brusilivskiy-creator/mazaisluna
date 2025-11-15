@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const newPosition = addPosition({
       name,
       category: category || null,
-      order: order !== undefined ? parseInt(order) : undefined,
+      ...(order !== undefined && order !== null && { order: parseInt(String(order)) }),
     });
 
     return NextResponse.json(newPosition, { status: 201 });
@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest) {
     const updated = updatePosition(id, {
       name,
       category: category || null,
-      order: order !== undefined ? parseInt(order) : currentPosition.order || 0,
+      order: order !== undefined && order !== null ? parseInt(String(order)) : (currentPosition.order || 0),
     });
 
     if (!updated) {
