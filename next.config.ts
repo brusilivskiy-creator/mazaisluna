@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     domains: [],
     remotePatterns: [],
   },
+  // Configure Turbopack
+  turbopack: {},
 };
 
 export default nextConfig;
