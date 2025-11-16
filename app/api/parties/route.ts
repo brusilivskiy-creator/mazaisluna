@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, logo, seats, note } = body;
+    const { name, logo, seats, note, leaderId, color } = body;
 
     if (!name || seats === undefined) {
       return NextResponse.json({ error: "Name and seats are required" }, { status: 400 });
@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
       logo: logo || "/images/political-parties/alt.png",
       seats: typeof seats === "number" ? seats : parseInt(String(seats)) || 0,
       note: note || null,
+      leaderId: leaderId ? parseInt(String(leaderId)) : null,
+      color: color || null,
     });
 
     return NextResponse.json(newParty, { status: 201 });
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, name, logo, seats, note } = body;
+    const { id, name, logo, seats, note, leaderId, color } = body;
 
     if (!id || !name || seats === undefined) {
       return NextResponse.json({ error: "ID, name and seats are required" }, { status: 400 });
@@ -52,6 +54,8 @@ export async function PUT(request: NextRequest) {
       logo: logo || "/images/political-parties/alt.png",
       seats: typeof seats === "number" ? seats : parseInt(String(seats)) || 0,
       note: note || null,
+      leaderId: leaderId ? parseInt(String(leaderId)) : null,
+      color: color || null,
     });
 
     if (!updated) {

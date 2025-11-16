@@ -99,25 +99,24 @@ export function ElectionsSection() {
     return party?.logo || null;
   };
 
+  const getPartyColor = (partyId: number | null): string => {
+    if (!partyId) return "#23527c";
+    const party = parties.find((p) => p.id === partyId);
+    return party?.color || "#23527c";
+  };
+
   const getCandidateName = (candidateId: number | null): string | null => {
     if (!candidateId) return null;
     const politician = politicians.find((p) => p.id === candidateId);
     return politician?.name || null;
   };
 
-  // Функция для получения цвета диаграммы на основе рейтинга и позиции
-  const getChartColor = (percentage: number, index: number): string => {
-    const colors = [
-      "#23527c", // 1 место - основной синий
-      "#059669", // 2 место - зеленый
-      "#dc2626", // 3 место - красный
-      "#ea580c", // 4 место - оранжевый
-      "#7c3aed", // 5 место - фиолетовый
-      "#0891b2", // 6 место - голубой
-      "#ca8a04", // 7 место - желтый
-      "#be185d", // 8 место - розовый
-    ];
-    return colors[index] || "#6b7280"; // серый для остальных
+  const getPoliticianPartyId = (politicianId: number | null): number | null => {
+    if (!politicianId) return null;
+    const politician = politicians.find((p) => p.id === politicianId);
+    if (!politician || !politician.party) return null;
+    const party = parties.find((p) => p.name === politician.party);
+    return party?.id || null;
   };
 
   return (
@@ -185,10 +184,10 @@ export function ElectionsSection() {
               <div className="space-y-fluid-sm">
                 {elections.parliament.parties
                   .sort((a, b) => b.percentage - a.percentage)
-                  .map((partyResult, index) => {
+                  .map((partyResult) => {
                     const partyLogo = getPartyLogo(partyResult.partyId);
                     const maxPercentage = elections.parliament ? Math.max(...elections.parliament.parties.map(p => p.percentage)) : 0;
-                    const chartColor = getChartColor(partyResult.percentage, index);
+                    const partyColor = getPartyColor(partyResult.partyId);
                     return (
                       <div
                         key={partyResult.partyId}
@@ -227,7 +226,7 @@ export function ElectionsSection() {
                             className="h-full rounded-full transition-all duration-500 ease-out"
                             style={{
                               width: `${(partyResult.percentage / maxPercentage) * 100}%`,
-                              backgroundColor: chartColor,
+                              backgroundColor: partyColor,
                             }}
                           />
                         </div>
@@ -339,17 +338,18 @@ export function ElectionsSection() {
             <div className="space-y-fluid-sm">
               {elections.leader.candidates
                 .sort((a, b) => b.percentage - a.percentage)
-                .map((candidate, index) => {
+                .map((candidate) => {
                   const politician = candidate.candidateId ? politicians.find((p) => p.id === candidate.candidateId) : null;
                   const candidateImage = politician?.image || null;
                   const candidateParty = politician?.party || null;
                   const candidatePartyLogo = politician?.partyLogo || null;
+                  const candidatePartyId = getPoliticianPartyId(candidate.candidateId);
                   const maxPercentage = elections.leader ? Math.max(...elections.leader.candidates.map(c => c.percentage)) : 0;
-                  const chartColor = getChartColor(candidate.percentage, index);
+                  const partyColor = getPartyColor(candidatePartyId);
                   
                   return (
                     <div
-                      key={index}
+                      key={candidate.candidateId || candidate.candidateName}
                       className="p-fluid-md border border-gray-300 rounded-lg bg-white hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center gap-fluid-sm mb-fluid-xs">
@@ -407,7 +407,7 @@ export function ElectionsSection() {
                           className="h-full rounded-full transition-all duration-500 ease-out"
                           style={{
                             width: `${(candidate.percentage / maxPercentage) * 100}%`,
-                            backgroundColor: chartColor,
+                            backgroundColor: partyColor,
                           }}
                         />
                       </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Party } from "@/lib/parties";
+import { Politician } from "@/lib/politicians";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
@@ -19,6 +20,7 @@ const AVAILABLE_LOGOS = [
 
 export default function AdminPartiesPage() {
   const [parties, setParties] = useState<Party[]>([]);
+  const [politicians, setPoliticians] = useState<Politician[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -26,6 +28,8 @@ export default function AdminPartiesPage() {
     logo: "/images/political-parties/alt.png",
     seats: 0,
     note: "",
+    leaderId: null as number | null,
+    color: "#23527c",
   });
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -33,6 +37,7 @@ export default function AdminPartiesPage() {
 
   useEffect(() => {
     fetchParties();
+    fetchPoliticians();
   }, []);
 
   const fetchParties = async () => {
@@ -44,6 +49,16 @@ export default function AdminPartiesPage() {
       console.error("Error fetching parties:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPoliticians = async () => {
+    try {
+      const response = await fetch("/api/politicians");
+      const data = await response.json();
+      setPoliticians(data);
+    } catch (error) {
+      console.error("Error fetching politicians:", error);
     }
   };
 
@@ -60,6 +75,8 @@ export default function AdminPartiesPage() {
             ...formData,
             seats: parseInt(formData.seats.toString()) || 0,
             note: formData.note || null,
+            leaderId: formData.leaderId || null,
+            color: formData.color || null,
           }),
         });
 
@@ -75,6 +92,8 @@ export default function AdminPartiesPage() {
             ...formData,
             seats: parseInt(formData.seats.toString()) || 0,
             note: formData.note || null,
+            leaderId: formData.leaderId || null,
+            color: formData.color || null,
           }),
         });
 
@@ -113,6 +132,8 @@ export default function AdminPartiesPage() {
       logo: party.logo,
       seats: party.seats,
       note: party.note || "",
+      leaderId: party.leaderId || null,
+      color: party.color || "#23527c",
     });
     setLogoPreview(party.logo);
     setShowForm(true);
@@ -120,7 +141,7 @@ export default function AdminPartiesPage() {
 
   const resetForm = () => {
     setEditingId(null);
-    setFormData({ name: "", logo: "/images/political-parties/alt.png", seats: 0, note: "" });
+    setFormData({ name: "", logo: "/images/political-parties/alt.png", seats: 0, note: "", leaderId: null, color: "#23527c" });
     setLogoPreview(null);
     setShowForm(false);
   };
@@ -314,6 +335,34 @@ export default function AdminPartiesPage() {
                       />
                     </div>
 
+                    <div>
+                      <label
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                        style={{ fontFamily: "var(--font-proba)" }}
+                      >
+                        Колір партії (для діаграм)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={formData.color}
+                          onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                          className="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={formData.color}
+                          onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                          placeholder="#23527c"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23527c] focus:border-transparent"
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-proba)" }}>
+                        Цей колір буде використовуватися у діаграмах на виборах та в парламенті
+                      </p>
+                    </div>
+
                     <div className="flex gap-4">
                       <button
                         type="submit"
@@ -336,62 +385,78 @@ export default function AdminPartiesPage() {
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {parties.map((party) => (
-                  <div
-                    key={party.id}
-                    className="bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col"
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="relative w-12 h-12 flex-shrink-0">
-                        <Image
-                          src={party.logo}
-                          alt={party.name}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-contain"
-                        />
+                {parties.map((party) => {
+                  return (
+                    <div
+                      key={party.id}
+                      className="bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="relative w-12 h-12 flex-shrink-0">
+                          <Image
+                            src={party.logo}
+                            alt={party.name}
+                            width={48}
+                            height={48}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h3
+                            className="text-lg font-bold text-gray-900 mb-1"
+                            style={{ fontFamily: "var(--font-proba)" }}
+                          >
+                            {party.name}
+                          </h3>
+                          <p
+                            className="text-sm font-bold text-[#23527c]"
+                            style={{ fontFamily: "var(--font-proba)" }}
+                          >
+                            {party.seats} мандатів
+                          </p>
+                          {party.color && (
+                            <div className="flex items-center gap-2 mt-2">
+                              <div
+                                className="w-4 h-4 rounded border border-gray-300"
+                                style={{ backgroundColor: party.color }}
+                              />
+                              <span
+                                className="text-xs text-gray-600"
+                                style={{ fontFamily: "var(--font-proba)" }}
+                              >
+                                {party.color}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h3
-                          className="text-lg font-bold text-gray-900 mb-1"
-                          style={{ fontFamily: "var(--font-proba)" }}
-                        >
-                          {party.name}
-                        </h3>
+                      {party.note && (
                         <p
-                          className="text-sm font-bold text-[#23527c]"
+                          className="text-xs text-gray-600 italic mb-4"
                           style={{ fontFamily: "var(--font-proba)" }}
                         >
-                          {party.seats} мандатів
+                          {party.note}
                         </p>
+                      )}
+                      <div className="flex gap-2 mt-auto pt-4 border-t border-gray-200">
+                        <button
+                          onClick={() => handleEdit(party)}
+                          className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        >
+                          Редагувати
+                        </button>
+                        <button
+                          onClick={() => handleDelete(party.id)}
+                          className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        >
+                          Видалити
+                        </button>
                       </div>
                     </div>
-                    {party.note && (
-                      <p
-                        className="text-xs text-gray-600 italic mb-4"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        {party.note}
-                      </p>
-                    )}
-                    <div className="flex gap-2 mt-auto pt-4 border-t border-gray-200">
-                      <button
-                        onClick={() => handleEdit(party)}
-                        className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        Редагувати
-                      </button>
-                      <button
-                        onClick={() => handleDelete(party.id)}
-                        className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        Видалити
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

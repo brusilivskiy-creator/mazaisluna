@@ -1,7 +1,7 @@
-"use client";
-
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { getAllLeadership } from "@/lib/leadership";
+import { getAllPositions } from "@/lib/positions";
+import { getPoliticianById } from "@/lib/politicians";
 
 interface Leader {
   id: number;
@@ -10,35 +10,35 @@ interface Leader {
   image: string | null;
   party: string | null;
   partyLogo: string | null;
+  positionOrder?: number;
 }
 
 export function LeadershipSection() {
-  const [leaders, setLeaders] = useState<Leader[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Fetch data on the server - no delay!
+  const leadership = getAllLeadership();
+  const positions = getAllPositions();
 
-  useEffect(() => {
-    fetch("/api/leadership")
-      .then((res) => res.json())
-      .then((data) => {
-        // Обмежуємо до перших 6 найважливіших посад для головної сторінки
-        setLeaders(data.slice(0, 6));
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching leadership:", error);
-        setLoading(false);
-      });
-  }, []);
+  // Enrich leadership data with politician information
+  const enrichedLeadership: Leader[] = leadership.map((person) => {
+    const politician = person.politicianId ? getPoliticianById(person.politicianId) : null;
+    const positionData = positions.find((p) => p.name === person.position);
 
-  if (loading) {
-    return (
-      <section className="h-full flex flex-col">
-        <div className="flex-1 flex flex-col">
-          <p style={{ fontFamily: "var(--font-proba)" }}>Завантаження...</p>
-        </div>
-      </section>
-    );
-  }
+    return {
+      id: person.id,
+      position: person.position,
+      name: politician?.name || null,
+      image: politician?.image || null,
+      party: politician?.party || null,
+      partyLogo: politician?.partyLogo || null,
+      positionOrder: positionData?.order || 9999,
+    };
+  });
+
+  // Sort by position order
+  enrichedLeadership.sort((a, b) => (a.positionOrder || 9999) - (b.positionOrder || 9999));
+
+  // Limit to first 6 most important positions for homepage
+  const leaders = enrichedLeadership.slice(0, 6);
 
   return (
     <section className="h-full flex flex-col">
@@ -106,5 +106,3 @@ export function LeadershipSection() {
     </section>
   );
 }
-
-

@@ -1,41 +1,20 @@
-"use client";
-
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { Party } from "@/lib/parties";
+import { Politician } from "@/lib/politicians";
+import { getAllParties } from "@/lib/parties";
+import { getAllPoliticians } from "@/lib/politicians";
+import { getParliamentConfig } from "@/lib/parliament";
 
 export function ParliamentSection() {
-  const [parties, setParties] = useState<Party[]>([]);
-  const [parliamentDiagram, setParliamentDiagram] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Fetch data on the server - no delay!
+  const partiesData = getAllParties();
+  const politiciansData = getAllPoliticians();
+  const parliamentData = getParliamentConfig();
 
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/parties").then((res) => res.json()),
-      fetch("/api/parliament").then((res) => res.json()),
-    ])
-      .then(([partiesData, parliamentData]) => {
-        // Фільтруємо тільки партії з мандатами > 0 для відображення в парламенті
-        const partiesWithSeats = partiesData.filter((party: Party) => party.seats > 0);
-        setParties(partiesWithSeats);
-        setParliamentDiagram(parliamentData.diagram);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return (
-      <section className="h-full flex flex-col">
-        <div className="flex-1 flex flex-col">
-          <p style={{ fontFamily: "var(--font-proba)" }}>Завантаження...</p>
-        </div>
-      </section>
-    );
-  }
+  // Filter only parties with seats > 0 for parliament display
+  const parties = partiesData.filter((party: Party) => party.seats > 0);
+  const politicians = politiciansData;
+  const parliamentDiagram = parliamentData.diagram;
 
   return (
     <section className="h-full flex flex-col">
@@ -62,47 +41,62 @@ export function ParliamentSection() {
 
         {/* Список партий */}
         <div className="auto-grid flex-1 min-h-0 content-start gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
-          {parties.map((party) => (
-          <div
-            key={party.id}
-            className="flex items-center gap-fluid-sm p-fluid-sm rounded-lg hover:shadow-md transition-shadow bg-white"
-          >
-              <div className="relative flex-shrink-0 flex items-center justify-center self-center" style={{ width: 'clamp(3rem, 6vw, 3.5rem)', height: 'clamp(3rem, 6vw, 3.5rem)' }}>
-                <Image
-                  src={party.logo}
-                  alt={party.name}
-                  width={56}
-                  height={56}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="flex-1 min-w-0 flex flex-col justify-center self-center">
-                <h3
-                  className="text-fluid-base font-semibold text-gray-900 mb-fluid-xs"
-                  style={{ fontFamily: "var(--font-proba)" }}
-                >
-                  {party.name}
-                </h3>
-                <p
-                  className="text-fluid-sm font-bold text-[#23527c]"
-                  style={{ fontFamily: "var(--font-proba)" }}
-                >
-                  {party.seats} мандатів
-                </p>
-                {party.note && (
-                  <p
-                    className="text-fluid-xs text-gray-600 italic mt-fluid-xs"
+          {parties.map((party) => {
+            const totalSeats = parties.reduce((sum, p) => sum + p.seats, 0);
+            const percentage = totalSeats > 0 ? (party.seats / totalSeats) * 100 : 0;
+            const partyColor = party.color || "#23527c";
+            
+            return (
+              <div
+                key={party.id}
+                className="flex items-center gap-fluid-sm p-fluid-sm rounded-lg border border-gray-300 hover:shadow-md transition-shadow bg-white"
+              >
+                <div className="relative flex-shrink-0 flex items-center justify-center self-center" style={{ width: 'clamp(3rem, 6vw, 3.5rem)', height: 'clamp(3rem, 6vw, 3.5rem)' }}>
+                  <Image
+                    src={party.logo}
+                    alt={party.name}
+                    width={56}
+                    height={56}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col justify-center self-center">
+                  <h3
+                    className="text-fluid-base font-semibold text-gray-900 mb-fluid-xs"
                     style={{ fontFamily: "var(--font-proba)" }}
                   >
-                    {party.note}
+                    {party.name}
+                  </h3>
+                  <p
+                    className="text-fluid-sm font-bold text-[#23527c] mb-fluid-xs"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    {party.seats} мандатів
                   </p>
-                )}
+                  {/* Діаграма по кількості мандатів */}
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden mt-fluid-xs">
+                    <div
+                      className="h-full rounded-full transition-all duration-500 ease-out"
+                      style={{
+                        width: `${percentage}%`,
+                        backgroundColor: partyColor,
+                      }}
+                    />
+                  </div>
+                  {party.note && (
+                    <p
+                      className="text-fluid-xs text-gray-600 italic mt-fluid-xs"
+                      style={{ fontFamily: "var(--font-proba)" }}
+                    >
+                      {party.note}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
-

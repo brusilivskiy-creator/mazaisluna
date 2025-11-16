@@ -7,6 +7,8 @@ export interface Party {
   logo: string;
   seats: number;
   note?: string | null;
+  leaderId?: number | null;
+  color?: string | null;
 }
 
 const dataFilePath = path.join(process.cwd(), "data", "parties.json");
