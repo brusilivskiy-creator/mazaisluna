@@ -40,7 +40,7 @@
   {
     "name": "Позафракційні",
     "logo": "/images/political-parties/alt.png",
-    "seats": 2,
+    "seats": 1,
     "note": null,
     "id": 7
   },
@@ -57,5 +57,12 @@
     "seats": 1,
     "note": null,
     "id": 9
+  },
+  {
+    "name": "Опозиційний Блок",
+    "logo": "/images/political-parties/1763288434400_Dribbble_shot_-_7.png",
+    "seats": 1,
+    "note": null,
+    "id": 10
   }
 ]

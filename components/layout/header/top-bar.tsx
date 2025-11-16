@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function TopBar() {
   return (
-    <div className="hidden md:flex items-center justify-between w-full border-b border-white/10 px-6 lg:px-8 xl:px-12 py-2">
+    <div className="hidden md:flex items-center justify-between w-full border-b border-white/10 px-4 lg:px-6 xl:px-8 py-1.5">
       <div className="flex items-center gap-2">
         <span
           className="text-white font-bold text-sm"

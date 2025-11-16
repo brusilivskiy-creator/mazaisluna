@@ -7,7 +7,7 @@ export default function ConstitutionPage() {
       <Header />
       <div className="page-wrapper">
         <main className="bg-white min-h-screen w-full">
-          <section className="py-12 md:py-16">
+          <section className="py-fluid-lg">
             <div className="content-wrapper">
               <article>
               <h1

@@ -2,8 +2,8 @@ import Image from "next/image";
 
 export function Logo() {
   return (
-    <div className="flex justify-center mb-4 md:mb-6">
-      <div className="relative w-16 h-16 md:w-24 md:h-24">
+    <div className="flex justify-center mb-fluid-md">
+      <div className="relative w-20 h-20" style={{ width: 'clamp(4rem, 8vw, 6rem)', height: 'clamp(4rem, 8vw, 6rem)' }}>
         <Image
           src="/images/logo.svg"
           alt="Логотип"

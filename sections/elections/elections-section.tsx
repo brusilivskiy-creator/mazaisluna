@@ -77,7 +77,7 @@ export function ElectionsSection() {
       <section className="h-full flex flex-col">
         <div className="flex-1 flex flex-col">
           <h2
-            className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-4 md:mb-6 text-left pb-3 border-b border-gray-300"
+            className="font-semibold text-gray-900 mb-fluid-lg text-left pb-fluid-sm border-b border-gray-300"
             style={{ fontFamily: "var(--font-proba)" }}
           >
             Вибори
@@ -105,11 +105,26 @@ export function ElectionsSection() {
     return politician?.name || null;
   };
 
+  // Функция для получения цвета диаграммы на основе рейтинга и позиции
+  const getChartColor = (percentage: number, index: number): string => {
+    const colors = [
+      "#23527c", // 1 место - основной синий
+      "#059669", // 2 место - зеленый
+      "#dc2626", // 3 место - красный
+      "#ea580c", // 4 место - оранжевый
+      "#7c3aed", // 5 место - фиолетовый
+      "#0891b2", // 6 место - голубой
+      "#ca8a04", // 7 место - желтый
+      "#be185d", // 8 место - розовый
+    ];
+    return colors[index] || "#6b7280"; // серый для остальных
+  };
+
   return (
     <section className="h-full flex flex-col">
       <div className="flex-1 flex flex-col">
         <h2
-          className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-4 md:mb-6 text-left pb-3 border-b border-gray-300"
+          className="font-semibold text-gray-900 mb-fluid-lg text-left pb-fluid-sm border-b border-gray-300"
           style={{ fontFamily: "var(--font-proba)" }}
         >
           Вибори
@@ -149,10 +164,10 @@ export function ElectionsSection() {
 
         {/* Parliament Election Content */}
         {activeTab === "parliament" && elections.parliament && (
-          <div className="space-y-6">
-            <div className="mb-4">
+          <div className="space-y-fluid-lg">
+            <div className="mb-fluid-md">
               <p
-                className="text-sm md:text-base text-gray-600"
+                className="text-gray-600"
                 style={{ fontFamily: "var(--font-proba)" }}
               >
                 Дата: {new Date(elections.parliament.date).toLocaleDateString("uk-UA")}
@@ -160,48 +175,62 @@ export function ElectionsSection() {
             </div>
 
             {/* Результати по партіях */}
-            <div className="mb-6">
+            <div className="mb-fluid-lg">
               <h3
-                className="text-base md:text-lg font-semibold text-gray-900 mb-3"
+                className="font-semibold text-gray-900 mb-fluid-md"
                 style={{ fontFamily: "var(--font-proba)" }}
               >
                 За партійними списками:
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-fluid-sm">
                 {elections.parliament.parties
                   .sort((a, b) => b.percentage - a.percentage)
-                  .map((partyResult) => {
+                  .map((partyResult, index) => {
                     const partyLogo = getPartyLogo(partyResult.partyId);
+                    const maxPercentage = Math.max(...elections.parliament.parties.map(p => p.percentage));
+                    const chartColor = getChartColor(partyResult.percentage, index);
                     return (
                       <div
                         key={partyResult.partyId}
-                        className="flex items-center justify-between p-3 border border-gray-300 rounded-lg bg-white"
+                        className="p-fluid-md border border-gray-300 rounded-lg bg-white hover:shadow-md transition-shadow"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-fluid-sm mb-fluid-xs">
                           {partyLogo && (
-                            <div className="relative w-8 h-8 flex-shrink-0">
+                            <div className="relative flex-shrink-0 flex items-center justify-center" style={{ width: 'clamp(2.5rem, 5vw, 3rem)', height: 'clamp(2.5rem, 5vw, 3rem)' }}>
                               <Image
                                 src={partyLogo}
                                 alt={partyResult.partyName}
-                                width={32}
-                                height={32}
+                                width={48}
+                                height={48}
                                 className="w-full h-full object-contain"
                               />
                             </div>
                           )}
-                          <span
-                            className="text-sm md:text-base font-medium text-gray-900"
-                            style={{ fontFamily: "var(--font-proba)" }}
-                          >
-                            {partyResult.partyName}
-                          </span>
+                          <div className="flex-1 min-w-0 flex items-center justify-between gap-fluid-sm">
+                            <h4
+                              className="font-semibold text-gray-900"
+                              style={{ fontFamily: "var(--font-proba)" }}
+                            >
+                              {partyResult.partyName}
+                            </h4>
+                            <p
+                              className="font-bold text-[#23527c] whitespace-nowrap"
+                              style={{ fontFamily: "var(--font-proba)" }}
+                            >
+                              {partyResult.percentage.toFixed(2)}%
+                            </p>
+                          </div>
                         </div>
-                        <span
-                          className="text-sm md:text-base font-bold text-[#23527c]"
-                          style={{ fontFamily: "var(--font-proba)" }}
-                        >
-                          {partyResult.percentage.toFixed(2)}%
-                        </span>
+                        {/* Progress Bar */}
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500 ease-out"
+                            style={{
+                              width: `${(partyResult.percentage / maxPercentage) * 100}%`,
+                              backgroundColor: chartColor,
+                            }}
+                          />
+                        </div>
                       </div>
                     );
                   })}
@@ -211,12 +240,12 @@ export function ElectionsSection() {
             {/* Мажоритарні округи */}
             <div>
               <h3
-                className="text-base md:text-lg font-semibold text-gray-900 mb-3"
+                className="font-semibold text-gray-900 mb-fluid-md"
                 style={{ fontFamily: "var(--font-proba)" }}
               >
                 Мажоритарні округи:
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="auto-grid gap-fluid-sm" style={{'--min-column-width': '280px'}}>
                 {elections.parliament.majoritarianDistricts.map((district) => {
                   const candidateName = district.candidateName || getCandidateName(district.candidateId);
                   const candidate = district.candidateId ? politicians.find((p) => p.id === district.candidateId) : null;
@@ -227,60 +256,62 @@ export function ElectionsSection() {
                   return (
                     <div
                       key={district.districtNumber}
-                      className="p-4 border border-gray-300 rounded-lg bg-white"
+                      className="p-fluid-md border border-gray-300 rounded-lg bg-white hover:shadow-md transition-shadow"
                     >
                       <div
-                        className="text-xs md:text-sm font-semibold text-[#23527c] mb-3"
+                        className="font-semibold text-[#23527c] mb-fluid-sm"
                         style={{ fontFamily: "var(--font-proba)" }}
                       >
                         Округ №{district.districtNumber}
                       </div>
                       {candidateName ? (
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-start text-left gap-fluid-sm">
+                          {/* Имя кандидата - всегда сверху */}
+                          <h4
+                            className="font-semibold text-gray-900 w-full mb-0"
+                            style={{ fontFamily: "var(--font-proba)" }}
+                          >
+                            {candidateName}
+                          </h4>
+                          
+                          {/* Фото кандидата */}
                           {candidateImage && (
-                            <div className="relative w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200">
+                            <div className="relative flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100" style={{ width: 'clamp(2.5rem, 6vw, 3rem)', height: 'clamp(2.5rem, 6vw, 3rem)' }}>
                               <Image
                                 src={candidateImage}
                                 alt={candidateName}
-                                width={56}
-                                height={56}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                               />
                             </div>
                           )}
-                          <div className="flex-1 min-w-0">
-                            <div
-                              className="text-sm md:text-base font-medium text-gray-900 mb-1"
-                              style={{ fontFamily: "var(--font-proba)" }}
-                            >
-                              {candidateName}
+                          
+                          {/* Партия с логотипом - под фото */}
+                          {candidateParty && (
+                            <div className="flex items-center justify-start gap-2 w-full mt-0">
+                              {candidatePartyLogo && (
+                                <div className="relative flex-shrink-0 flex items-center justify-center rounded overflow-hidden bg-white border border-gray-200" style={{ width: 'clamp(1.5rem, 3vw, 1.75rem)', height: 'clamp(1.5rem, 3vw, 1.75rem)' }}>
+                                  <Image
+                                    src={candidatePartyLogo}
+                                    alt={candidateParty}
+                                    width={28}
+                                    height={28}
+                                    className="w-full h-full object-contain p-1"
+                                  />
+                                </div>
+                              )}
+                              <span
+                                className="text-gray-600 leading-none"
+                                style={{ fontFamily: "var(--font-proba)" }}
+                              >
+                                {candidateParty}
+                              </span>
                             </div>
-                            {candidateParty && (
-                              <div className="flex items-center gap-2">
-                                {candidatePartyLogo && (
-                                  <div className="relative w-5 h-5 md:w-6 md:h-6 flex-shrink-0 rounded overflow-hidden bg-white border border-gray-200">
-                                    <Image
-                                      src={candidatePartyLogo}
-                                      alt={candidateParty}
-                                      width={24}
-                                      height={24}
-                                      className="w-full h-full object-contain p-0.5"
-                                    />
-                                  </div>
-                                )}
-                                <span
-                                  className="text-xs md:text-sm text-gray-600"
-                                  style={{ fontFamily: "var(--font-proba)" }}
-                                >
-                                  {candidateParty}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
                       ) : (
                         <span
-                          className="text-xs md:text-sm text-gray-500 italic"
+                          className="text-gray-500 italic"
                           style={{ fontFamily: "var(--font-proba)" }}
                         >
                           Не вказано
@@ -296,16 +327,16 @@ export function ElectionsSection() {
 
         {/* Leader Election Content */}
         {activeTab === "leader" && elections.leader && (
-          <div className="space-y-6">
-            <div className="mb-4">
+          <div className="space-y-fluid-lg">
+            <div className="mb-fluid-md">
               <p
-                className="text-sm md:text-base text-gray-600"
+                className="text-gray-600"
                 style={{ fontFamily: "var(--font-proba)" }}
               >
                 Дата: {new Date(elections.leader.date).toLocaleDateString("uk-UA")}
               </p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-fluid-sm">
               {elections.leader.candidates
                 .sort((a, b) => b.percentage - a.percentage)
                 .map((candidate, index) => {
@@ -313,60 +344,73 @@ export function ElectionsSection() {
                   const candidateImage = politician?.image || null;
                   const candidateParty = politician?.party || null;
                   const candidatePartyLogo = politician?.partyLogo || null;
+                  const maxPercentage = Math.max(...elections.leader.candidates.map(c => c.percentage));
+                  const chartColor = getChartColor(candidate.percentage, index);
                   
                   return (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 border border-gray-300 rounded-lg bg-white gap-4"
+                      className="p-fluid-md border border-gray-300 rounded-lg bg-white hover:shadow-md transition-shadow"
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex items-center gap-fluid-sm mb-fluid-xs">
                         {candidateImage && (
-                          <div className="relative w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200">
+                          <div className="relative flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100" style={{ width: 'clamp(3rem, 7vw, 3.5rem)', height: 'clamp(3rem, 7vw, 3.5rem)' }}>
                             <Image
                               src={candidateImage}
                               alt={candidate.candidateName}
-                              width={56}
-                              height={56}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <div
-                            className="text-sm md:text-base font-medium text-gray-900 mb-1"
+                        <div className="flex-1 min-w-0 flex items-center justify-between gap-fluid-sm">
+                          <div className="flex-1 min-w-0">
+                            <h4
+                              className="font-semibold text-gray-900 mb-fluid-xs"
+                              style={{ fontFamily: "var(--font-proba)" }}
+                            >
+                              {candidate.candidateName}
+                            </h4>
+                            {candidateParty && (
+                              <div className="flex items-center gap-2">
+                                {candidatePartyLogo && (
+                                  <div className="relative flex-shrink-0 flex items-center justify-center rounded overflow-hidden bg-white border border-gray-200" style={{ width: 'clamp(1.5rem, 3vw, 1.75rem)', height: 'clamp(1.5rem, 3vw, 1.75rem)' }}>
+                                    <Image
+                                      src={candidatePartyLogo}
+                                      alt={candidateParty}
+                                      width={28}
+                                      height={28}
+                                      className="w-full h-full object-contain p-1"
+                                    />
+                                  </div>
+                                )}
+                                <span
+                                  className="text-gray-600 leading-none"
+                                  style={{ fontFamily: "var(--font-proba)" }}
+                                >
+                                  {candidateParty}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <p
+                            className="font-bold text-[#23527c] whitespace-nowrap"
                             style={{ fontFamily: "var(--font-proba)" }}
                           >
-                            {candidate.candidateName}
-                          </div>
-                          {candidateParty && (
-                            <div className="flex items-center gap-2">
-                              {candidatePartyLogo && (
-                                <div className="relative w-5 h-5 md:w-6 md:h-6 flex-shrink-0 rounded overflow-hidden bg-white border border-gray-200">
-                                  <Image
-                                    src={candidatePartyLogo}
-                                    alt={candidateParty}
-                                    width={24}
-                                    height={24}
-                                    className="w-full h-full object-contain p-0.5"
-                                  />
-                                </div>
-                              )}
-                              <span
-                                className="text-xs md:text-sm text-gray-600"
-                                style={{ fontFamily: "var(--font-proba)" }}
-                              >
-                                {candidateParty}
-                              </span>
-                            </div>
-                          )}
+                            {candidate.percentage.toFixed(2)}%
+                          </p>
                         </div>
                       </div>
-                      <span
-                        className="text-sm md:text-base font-bold text-[#23527c] whitespace-nowrap"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        {candidate.percentage.toFixed(2)}%
-                      </span>
+                      {/* Progress Bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500 ease-out"
+                          style={{
+                            width: `${(candidate.percentage / maxPercentage) * 100}%`,
+                            backgroundColor: chartColor,
+                          }}
+                        />
+                      </div>
                     </div>
                   );
                 })}

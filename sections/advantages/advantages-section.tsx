@@ -23,45 +23,41 @@ const advantages = [
 
 export function AdvantagesSection() {
   return (
-    <section className="py-12 md:py-16">
+    <section className="py-fluid-lg">
       <div className="content-wrapper">
         <h2
-          className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 md:mb-8 text-left pb-4 border-b border-gray-300"
+          className="font-semibold text-gray-900 mb-fluid-lg text-left pb-fluid-md border-b border-gray-300"
           style={{ fontFamily: "var(--font-proba)" }}
         >
           Переваги держави
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 border border-gray-300">
+        <div className="auto-grid" style={{'--min-column-width': '280px', '--grid-gap': '0'}}>
           {advantages.map((advantage, index) => {
             const Icon = advantage.icon;
-            const isLastInRow = (index + 1) % 3 === 0;
-            const isInLastRow = index >= advantages.length - 3;
 
             return (
               <div
                 key={index}
-                className={`
-                  p-6 md:p-8
-                  ${!isLastInRow ? "border-r border-gray-300" : ""}
-                  ${!isInLastRow ? "border-b border-gray-300" : ""}
-                `}
+                className="p-fluid-md flex items-start gap-fluid-md"
               >
-                <div className="mb-4">
-                  <Icon className="w-10 h-10 md:w-12 md:h-12 stroke-2" style={{ color: "#23527c" }} />
+                <div className="flex-shrink-0">
+                  <Icon className="stroke-2" style={{ color: "#23527c", width: 'clamp(2.5rem, 5vw, 3rem)', height: 'clamp(2.5rem, 5vw, 3rem)' }} />
                 </div>
-                <h3
-                  className="text-base md:text-lg font-bold mb-3"
-                  style={{ fontFamily: "var(--font-proba)", color: "#23527c" }}
-                >
-                  {advantage.title}
-                </h3>
-                <p
-                  className="text-sm md:text-base text-gray-900 leading-relaxed"
-                  style={{ fontFamily: "var(--font-proba)" }}
-                >
-                  {advantage.description}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <h3
+                    className="text-fluid-lg font-bold mb-fluid-sm"
+                    style={{ fontFamily: "var(--font-proba)", color: "#23527c" }}
+                  >
+                    {advantage.title}
+                  </h3>
+                  <p
+                    className="text-fluid-base text-gray-900 leading-relaxed"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    {advantage.description}
+                  </p>
+                </div>
               </div>
             );
           })}

@@ -11,22 +11,22 @@ export function Footer() {
       }}
     >
       <div className="header-wrapper">
-        <div className="w-full py-6 md:py-8">
+        <div className="w-full py-fluid-md">
           <div className="text-center">
             <p
-              className="text-sm md:text-base lg:text-lg text-white/90 px-2 md:px-0 mb-2"
+              className="text-fluid-base text-white/90 text-center mx-auto mb-fluid-sm"
               style={{ fontFamily: "var(--font-proba)" }}
             >
               Сайт є власністю держави Мезайс Луна і створений гравцем Вікторією Коваленко.
             </p>
             <p
-              className="text-xs md:text-sm text-white/70 px-2 md:px-0 mb-2"
+              className="text-fluid-sm text-white/70 text-center mx-auto mb-fluid-sm"
               style={{ fontFamily: "var(--font-proba)" }}
             >
               Усі персонажі, партії та події в нашому RP є вигаданими, а будь-які збіги з реальними публічними особами (політиками) чи подіями є випадковими або використовуються виключно заради RP.
             </p>
             <p
-              className="text-xs md:text-sm text-white/70 px-2 md:px-0"
+              className="text-fluid-sm text-white/70 text-center mx-auto"
               style={{ fontFamily: "var(--font-proba)" }}
             >
               © {currentYear} Мезайс Луна. Всі права захищені.

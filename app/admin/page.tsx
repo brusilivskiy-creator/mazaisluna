@@ -58,6 +58,13 @@ const adminSections = [
     color: "bg-orange-500",
   },
   {
+    href: "/admin/categories",
+    label: "Рубрики",
+    description: "Управління рубриками та категоріями",
+    icon: FileText,
+    color: "bg-teal-500",
+  },
+  {
     href: "/admin/settings",
     label: "Налаштування",
     description: "Загальні налаштування сайту",

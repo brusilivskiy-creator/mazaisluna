@@ -13,14 +13,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    if (!type || (type !== "party" && type !== "person")) {
-      return NextResponse.json({ error: "Invalid type. Must be 'party' or 'person'" }, { status: 400 });
+    if (!type || (type !== "party" && type !== "person" && type !== "news" && type !== "parliament")) {
+      return NextResponse.json({ error: "Invalid type. Must be 'party', 'person', 'news' or 'parliament'" }, { status: 400 });
     }
 
     // Визначаємо папку для зберігання
     const uploadDir = type === "party" 
       ? path.join(process.cwd(), "public", "images", "political-parties")
-      : path.join(process.cwd(), "public", "images", "people");
+      : type === "person"
+      ? path.join(process.cwd(), "public", "images", "people")
+      : type === "parliament"
+      ? path.join(process.cwd(), "public", "images", "parliament")
+      : path.join(process.cwd(), "public", "images", "news");
 
     // Створюємо папку, якщо вона не існує
     if (!existsSync(uploadDir)) {
@@ -43,7 +47,11 @@ export async function POST(request: NextRequest) {
     // Повертаємо шлях відносно public
     const relativePath = type === "party"
       ? `/images/political-parties/${fileName}`
-      : `/images/people/${fileName}`;
+      : type === "person"
+      ? `/images/people/${fileName}`
+      : type === "parliament"
+      ? `/images/parliament/${fileName}`
+      : `/images/news/${fileName}`;
 
     return NextResponse.json({ 
       success: true, 

@@ -85,6 +85,38 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+  
+  /* ══════════════════════════════════════════════
+     UNIFIED TYPOGRAPHY (for Tailwind)
+     ══════════════════════════════════════════════ */
+  --font-size-h1: var(--fs-h1);
+  --font-size-h2: var(--fs-h2);
+  --font-size-h3: var(--fs-h3);
+  --font-size-h4: var(--fs-h4);
+  --font-size-h5: var(--fs-h5);
+  --font-size-h6: var(--fs-h6);
+  --font-size-p: var(--fs-p);
+  
+  /* Legacy fluid sizes (deprecated) */
+  --font-size-fluid-xs: clamp(0.75rem, 1.5vw, 0.875rem);
+  --font-size-fluid-sm: clamp(0.875rem, 2vw, 1rem);
+  --font-size-fluid-base: var(--fs-p);
+  --font-size-fluid-lg: clamp(1.125rem, 3vw, 1.25rem);
+  --font-size-fluid-xl: clamp(1.25rem, 3.5vw, 1.5rem);
+  --font-size-fluid-2xl: clamp(1.5rem, 4vw, 2rem);
+  --font-size-fluid-3xl: clamp(2rem, 5vw, 3rem);
+  --font-size-fluid-4xl: clamp(2.5rem, 6vw, 4rem);
+  --font-size-fluid-5xl: clamp(3rem, 8vw, 5rem);
+  
+  /* ══════════════════════════════════════════════
+     FLUID SPACING (for Tailwind)
+     ══════════════════════════════════════════════ */
+  --spacing-fluid-xs: clamp(0.25rem, 1vw, 0.5rem);
+  --spacing-fluid-sm: clamp(0.5rem, 2vw, 1rem);
+  --spacing-fluid-md: clamp(1rem, 4vw, 2rem);
+  --spacing-fluid-lg: clamp(2rem, 6vw, 3rem);
+  --spacing-fluid-xl: clamp(3rem, 8vw, 5rem);
+  --spacing-fluid-2xl: clamp(4rem, 12vw, 8rem);
 }
 
 :root {
@@ -146,6 +178,57 @@
   --header-gold: #d4af37;
   --header-text: #ffffff;
   --header-subtitle: #b0b8c4;
+  
+  /* ══════════════════════════════════════════════
+     UNIFIED TYPOGRAPHY SCALE (Responsive)
+     Based on: h1=36px, h2=30px, h3=24px, h4=20px, h5=18px, h6=16px, p=18px
+     ══════════════════════════════════════════════ */
+  /* h1: 36px base (32px mobile → 40px desktop) */
+  --fs-h1: clamp(2rem, 1.25vw + 1.25rem, 2.5rem);
+  
+  /* h2: 30px base (28px mobile → 32px desktop) */
+  --fs-h2: clamp(1.75rem, 0.75vw + 1.125rem, 2rem);
+  
+  /* h3: 24px base (22px mobile → 26px desktop) */
+  --fs-h3: clamp(1.375rem, 0.625vw + 0.875rem, 1.625rem);
+  
+  /* h4: 20px base (18px mobile → 22px desktop) */
+  --fs-h4: clamp(1.125rem, 0.5vw + 0.75rem, 1.375rem);
+  
+  /* h5: 18px base (16px mobile → 20px desktop) */
+  --fs-h5: clamp(1rem, 0.375vw + 0.75rem, 1.25rem);
+  
+  /* h6: 16px base (14px mobile → 18px desktop) */
+  --fs-h6: clamp(0.875rem, 0.375vw + 0.625rem, 1.125rem);
+  
+  /* p (body text): 18px base (16px mobile → 18px desktop) */
+  --fs-p: clamp(1rem, 0.25vw + 0.875rem, 1.125rem);
+  
+  /* Legacy fluid sizes (deprecated - use above) */
+  --fs-xs: clamp(0.75rem, 1.5vw, 0.875rem);
+  --fs-sm: clamp(0.875rem, 2vw, 1rem);
+  --fs-base: var(--fs-p);
+  --fs-lg: clamp(1.125rem, 3vw, 1.25rem);
+  --fs-xl: clamp(1.25rem, 3.5vw, 1.5rem);
+  --fs-2xl: clamp(1.5rem, 4vw, 2rem);
+  --fs-3xl: clamp(2rem, 5vw, 3rem);
+  --fs-4xl: clamp(2.5rem, 6vw, 4rem);
+  --fs-5xl: clamp(3rem, 8vw, 5rem);
+  
+  /* ══════════════════════════════════════════════
+     FLUID SPACING
+     ══════════════════════════════════════════════ */
+  --space-xs: clamp(0.25rem, 1vw, 0.5rem);
+  --space-sm: clamp(0.5rem, 2vw, 1rem);
+  --space-md: clamp(1rem, 4vw, 2rem);
+  --space-lg: clamp(2rem, 6vw, 3rem);
+  --space-xl: clamp(3rem, 8vw, 5rem);
+  --space-2xl: clamp(4rem, 12vw, 8rem);
+  
+  /* ══════════════════════════════════════════════
+     CONTAINER PADDING (Fluid)
+     ══════════════════════════════════════════════ */
+  --container-padding: clamp(1rem, 4vw, 2rem);
 }
 
 .dark {
@@ -205,9 +288,81 @@
   * {
     @apply border-border outline-ring/50;
   }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   body {
     background: #ffffff;
     @apply text-foreground;
+    font-size: var(--fs-p);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  
+  /* ══════════════════════════════════════════════
+     UNIFIED TYPOGRAPHY SYSTEM
+     ══════════════════════════════════════════════ */
+  h1 {
+    font-size: var(--fs-h1); /* 36px (32-40px responsive) */
+    line-height: 1.1;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+  }
+  
+  h2 {
+    font-size: var(--fs-h2); /* 30px (28-32px responsive) */
+    line-height: 1.2;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+  }
+  
+  h3 {
+    font-size: var(--fs-h3); /* 24px (22-26px responsive) */
+    line-height: 1.3;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+  }
+  
+  h4 {
+    font-size: var(--fs-h4); /* 20px (18-22px responsive) */
+    line-height: 1.4;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+  }
+  
+  h5 {
+    font-size: var(--fs-h5); /* 18px (16-20px responsive) */
+    line-height: 1.5;
+    font-weight: 500;
+    margin-bottom: 0.5em;
+  }
+  
+  h6 {
+    font-size: var(--fs-h6); /* 16px (14-18px responsive) */
+    line-height: 1.5;
+    font-weight: 500;
+    margin-bottom: 0.5em;
+  }
+  
+  p {
+    font-size: var(--fs-p); /* 18px (16-18px responsive) */
+    line-height: 1.6;
+    margin-bottom: 1em;
+    max-width: 75ch;
+  }
+  
+  li {
+    font-size: var(--fs-p);
+    line-height: 1.6;
+    max-width: 75ch;
+  }
+  
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
   }
 }
 
@@ -219,45 +374,91 @@
 .header-wrapper {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--container-padding);
 }
 
 .content-wrapper {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--container-padding);
 }
 
-@media (max-width: 768px) {
-  .page-wrapper {
-    width: 100%;
-    padding: 0;
+@layer utilities {
+  /* ══════════════════════════════════════════════
+     AUTO-RESPONSIVE GRID
+     ══════════════════════════════════════════════ */
+  .auto-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--min-column-width, 300px)), 1fr)
+    );
+    gap: var(--grid-gap, clamp(1rem, 3vw, 2rem));
   }
   
-  .header-wrapper {
-    width: 100%;
-    padding: 0 16px;
+  /* ══════════════════════════════════════════════
+     FLEX STACK (Auto-responsive)
+     ══════════════════════════════════════════════ */
+  .flex-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stack-gap, 1rem);
   }
   
-  .content-wrapper {
-    width: 100%;
-    padding: 0 16px;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .page-wrapper {
-    width: 100%;
-    padding: 0;
+  .flex-stack > * {
+    flex: 1 1 min(100%, var(--stack-min-width, 300px));
   }
   
-  .header-wrapper {
-    width: 100%;
-    padding: 0 24px;
-  }
+  /* ══════════════════════════════════════════════
+     FLUID TYPOGRAPHY UTILITIES
+     ══════════════════════════════════════════════ */
+  .text-fluid-xs { font-size: var(--fs-xs); }
+  .text-fluid-sm { font-size: var(--fs-sm); }
+  .text-fluid-base { font-size: var(--fs-base); }
+  .text-fluid-lg { font-size: var(--fs-lg); }
+  .text-fluid-xl { font-size: var(--fs-xl); }
+  .text-fluid-2xl { font-size: var(--fs-2xl); }
+  .text-fluid-3xl { font-size: var(--fs-3xl); }
+  .text-fluid-4xl { font-size: var(--fs-4xl); }
+  .text-fluid-5xl { font-size: var(--fs-5xl); }
   
-  .content-wrapper {
-    width: 100%;
-    padding: 0 24px;
-  }
+  /* ══════════════════════════════════════════════
+     FLUID SPACING UTILITIES
+     ══════════════════════════════════════════════ */
+  .p-fluid-xs { padding: var(--space-xs); }
+  .p-fluid-sm { padding: var(--space-sm); }
+  .p-fluid-md { padding: var(--space-md); }
+  .p-fluid-lg { padding: var(--space-lg); }
+  .p-fluid-xl { padding: var(--space-xl); }
+  .p-fluid-2xl { padding: var(--space-2xl); }
+  
+  .px-fluid-xs { padding-left: var(--space-xs); padding-right: var(--space-xs); }
+  .px-fluid-sm { padding-left: var(--space-sm); padding-right: var(--space-sm); }
+  .px-fluid-md { padding-left: var(--space-md); padding-right: var(--space-md); }
+  .px-fluid-lg { padding-left: var(--space-lg); padding-right: var(--space-lg); }
+  .px-fluid-xl { padding-left: var(--space-xl); padding-right: var(--space-xl); }
+  
+  .py-fluid-xs { padding-top: var(--space-xs); padding-bottom: var(--space-xs); }
+  .py-fluid-sm { padding-top: var(--space-sm); padding-bottom: var(--space-sm); }
+  .py-fluid-md { padding-top: var(--space-md); padding-bottom: var(--space-md); }
+  .py-fluid-lg { padding-top: var(--space-lg); padding-bottom: var(--space-lg); }
+  .py-fluid-xl { padding-top: var(--space-xl); padding-bottom: var(--space-xl); }
+  
+  .gap-fluid-xs { gap: var(--space-xs); }
+  .gap-fluid-sm { gap: var(--space-sm); }
+  .gap-fluid-md { gap: var(--space-md); }
+  .gap-fluid-lg { gap: var(--space-lg); }
+  .gap-fluid-xl { gap: var(--space-xl); }
+  
+  .mb-fluid-xs { margin-bottom: var(--space-xs); }
+  .mb-fluid-sm { margin-bottom: var(--space-sm); }
+  .mb-fluid-md { margin-bottom: var(--space-md); }
+  .mb-fluid-lg { margin-bottom: var(--space-lg); }
+  .mb-fluid-xl { margin-bottom: var(--space-xl); }
+  
+  .mt-fluid-xs { margin-top: var(--space-xs); }
+  .mt-fluid-sm { margin-top: var(--space-sm); }
+  .mt-fluid-md { margin-top: var(--space-md); }
+  .mt-fluid-lg { margin-top: var(--space-lg); }
+  .mt-fluid-xl { margin-top: var(--space-xl); }
 }
