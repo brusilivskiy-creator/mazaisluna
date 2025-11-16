@@ -49,14 +49,14 @@ export function LeadershipCardsSection() {
           Керівництво держави
         </h1>
 
-        <div className="auto-grid gap-fluid-md" style={{'--min-column-width': '240px'} as React.CSSProperties}>
+        <div className="grid grid-cols-1 gap-fluid-md justify-items-start md:grid-cols-3 md:justify-items-stretch">
           {leaders.map((leader) => (
             <div
               key={leader.id}
-              className="p-fluid-md rounded-lg hover:shadow-md transition-shadow bg-white flex flex-col items-center text-center"
+              className="w-full p-fluid-md rounded-lg hover:shadow-md transition-shadow bg-white flex flex-row items-start justify-start text-left md:flex-col md:items-center md:text-center"
             >
               {leader.image && (
-                <div className="relative w-24 h-24 mb-fluid-md flex-shrink-0 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100">
+                <div className="relative w-24 h-24 mb-0 mr-fluid-md flex-shrink-0 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100 md:mb-fluid-md md:mr-0 md:w-24 md:h-24 md:flex-shrink-0">
                   <Image
                     src={leader.image}
                     alt={leader.name || "Політик"}
@@ -65,21 +65,21 @@ export function LeadershipCardsSection() {
                   />
                 </div>
               )}
-              <div className="flex-1 flex flex-col items-center w-full">
+              <div className="flex-1 flex flex-col items-start justify-start w-full text-left md:flex-1 md:items-center md:text-center md:w-full">
                 <h3
-                  className="text-fluid-lg font-bold text-gray-900 mb-fluid-xs"
+                  className="text-fluid-lg font-bold text-gray-900 mb-fluid-xs text-left w-full md:text-center"
                   style={{ fontFamily: "var(--font-proba)" }}
                 >
                   {leader.name || "Не вказано"}
                 </h3>
                 <p
-                  className="text-fluid-sm font-semibold text-[#23527c] mb-fluid-sm"
+                  className="text-fluid-sm font-semibold text-[#23527c] mb-fluid-sm text-left w-full md:text-center"
                   style={{ fontFamily: "var(--font-proba)" }}
                 >
                   {leader.position}
                 </p>
                 {leader.party && leader.partyLogo && (
-                  <div className="flex items-center justify-center gap-2 mt-auto pt-fluid-sm border-t border-gray-200 w-full">
+                  <div className="flex items-center justify-start gap-2 mt-auto pt-fluid-sm border-t border-gray-200 w-full md:justify-center">
                     <div className="relative flex-shrink-0 flex items-center justify-center rounded overflow-hidden bg-white border border-gray-200" style={{ width: 'clamp(1.5rem, 3vw, 1.75rem)', height: 'clamp(1.5rem, 3vw, 1.75rem)' }}>
                       <Image
                         src={leader.partyLogo}

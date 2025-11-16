@@ -39,9 +39,9 @@ export function ParliamentSection() {
 
   return (
     <section className="h-full flex flex-col">
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         <h2
-          className="font-semibold text-gray-900 mb-fluid-lg text-left pb-fluid-sm border-b border-gray-300"
+          className="font-semibold text-gray-900 mb-fluid-md text-left pb-fluid-sm border-b border-gray-300 flex-shrink-0"
           style={{ fontFamily: "var(--font-proba)" }}
         >
           Склад парламенту
@@ -49,7 +49,7 @@ export function ParliamentSection() {
 
         {/* Діаграма парламенту */}
         {parliamentDiagram && (
-          <div className="mb-fluid-lg">
+          <div className="mb-fluid-md flex-shrink-0">
             <Image
               src={parliamentDiagram}
               alt="Діаграма складу парламенту"
@@ -61,7 +61,7 @@ export function ParliamentSection() {
         )}
 
         {/* Список партий */}
-        <div className="auto-grid flex-1 content-start gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
+        <div className="auto-grid flex-1 min-h-0 content-start gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
           {parties.map((party) => (
           <div
             key={party.id}
