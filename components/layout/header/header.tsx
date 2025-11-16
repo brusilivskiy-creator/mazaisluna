@@ -15,7 +15,7 @@ export function Header() {
     >
       <div className="header-wrapper">
         {/* Мобильная верхняя панель */}
-        <div className="flex items-center justify-between px-fluid-sm py-fluid-xs md:hidden border-b border-white/10">
+        <div className="flex items-center justify-between px-fluid-sm py-fluid-sm md:hidden border-b border-white/10">
           <MobileMenu />
           <button
             className="flex items-center gap-2 text-white hover:text-[#ffe358] transition-colors duration-200"
@@ -32,14 +32,14 @@ export function Header() {
         </div>
 
         {/* Основной контент хедера */}
-        <div className="w-full py-fluid-sm">
+        <div className="w-full py-fluid-sm md:py-fluid-sm">
           {/* Логотип */}
           <Logo />
 
           {/* Заголовок и подзаголовок */}
-          <div className="text-center mb-fluid-sm">
+          <div className="text-center mb-fluid-md md:mb-fluid-sm">
             <h1
-              className="font-semibold mb-fluid-xs text-white"
+              className="font-semibold mb-fluid-sm md:mb-fluid-xs text-white"
               style={{ fontFamily: "var(--font-proba)", fontVariant: "small-caps" }}
             >
               Урядовий портал Мезайс Луни
