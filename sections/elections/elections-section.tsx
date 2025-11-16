@@ -187,7 +187,7 @@ export function ElectionsSection() {
                   .sort((a, b) => b.percentage - a.percentage)
                   .map((partyResult, index) => {
                     const partyLogo = getPartyLogo(partyResult.partyId);
-                    const maxPercentage = Math.max(...elections.parliament.parties.map(p => p.percentage));
+                    const maxPercentage = elections.parliament ? Math.max(...elections.parliament.parties.map(p => p.percentage)) : 0;
                     const chartColor = getChartColor(partyResult.percentage, index);
                     return (
                       <div
@@ -245,7 +245,7 @@ export function ElectionsSection() {
               >
                 Мажоритарні округи:
               </h3>
-              <div className="auto-grid gap-fluid-sm" style={{'--min-column-width': '280px'}}>
+              <div className="auto-grid gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
                 {elections.parliament.majoritarianDistricts.map((district) => {
                   const candidateName = district.candidateName || getCandidateName(district.candidateId);
                   const candidate = district.candidateId ? politicians.find((p) => p.id === district.candidateId) : null;
@@ -344,7 +344,7 @@ export function ElectionsSection() {
                   const candidateImage = politician?.image || null;
                   const candidateParty = politician?.party || null;
                   const candidatePartyLogo = politician?.partyLogo || null;
-                  const maxPercentage = Math.max(...elections.leader.candidates.map(c => c.percentage));
+                  const maxPercentage = elections.leader ? Math.max(...elections.leader.candidates.map(c => c.percentage)) : 0;
                   const chartColor = getChartColor(candidate.percentage, index);
                   
                   return (

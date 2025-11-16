@@ -32,7 +32,7 @@ export function AdvantagesSection() {
           Переваги держави
         </h2>
 
-        <div className="auto-grid" style={{'--min-column-width': '280px', '--grid-gap': '0'}}>
+        <div className="auto-grid" style={{'--min-column-width': '280px', '--grid-gap': '0'} as React.CSSProperties}>
           {advantages.map((advantage, index) => {
             const Icon = advantage.icon;
 

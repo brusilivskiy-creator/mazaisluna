@@ -61,7 +61,7 @@ export function ParliamentSection() {
         )}
 
         {/* Список партий */}
-        <div className="auto-grid flex-1 content-start gap-fluid-sm" style={{'--min-column-width': '280px'}}>
+        <div className="auto-grid flex-1 content-start gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
           {parties.map((party) => (
           <div
             key={party.id}

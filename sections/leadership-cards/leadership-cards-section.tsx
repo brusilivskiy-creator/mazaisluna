@@ -49,7 +49,7 @@ export function LeadershipCardsSection() {
           Керівництво держави
         </h1>
 
-        <div className="auto-grid gap-fluid-md" style={{'--min-column-width': '240px'}}>
+        <div className="auto-grid gap-fluid-md" style={{'--min-column-width': '240px'} as React.CSSProperties}>
           {leaders.map((leader) => (
             <div
               key={leader.id}

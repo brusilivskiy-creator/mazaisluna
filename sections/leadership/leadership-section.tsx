@@ -50,7 +50,7 @@ export function LeadershipSection() {
           Керівництво держави
         </h2>
 
-        <div className="auto-grid flex-1 content-start gap-fluid-md" style={{'--min-column-width': '240px'}}>
+        <div className="auto-grid flex-1 content-start gap-fluid-md" style={{'--min-column-width': '240px'} as React.CSSProperties}>
           {leaders.map((leader) => (
             <div
               key={leader.id}
