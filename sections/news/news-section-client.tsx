@@ -186,7 +186,14 @@ export function NewsSectionClient({ news, navigationItems }: NewsSectionClientPr
           {/* Правая колонка - список новостей */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg pt-0 px-0 md:px-fluid-md pb-fluid-md sticky top-4">
-              <div className="space-y-fluid-sm">
+              {/* Заголовок "Всі новини" */}
+              <h2
+                className="font-semibold text-gray-900 mb-fluid-md text-left pb-fluid-sm border-b border-gray-300 -mt-fluid-md"
+                style={{ fontFamily: "var(--font-proba)" }}
+              >
+                Всі новини
+              </h2>
+              <div className="space-y-fluid-sm mt-fluid-md">
                 {listNews.slice(0, 6).map((item) => {
                   const dateInfo = formatDate(item.date);
                   const slug = getNewsSlug(item.title);

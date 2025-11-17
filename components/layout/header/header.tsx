@@ -19,7 +19,7 @@ export function Header() {
         </div>
 
         {/* Основной контент хедера */}
-        <div className="w-full py-fluid-sm md:py-fluid-sm">
+        <div className="w-full pt-fluid-md pb-fluid-sm md:pt-fluid-md md:pb-fluid-sm">
           {/* Логотип */}
           <Logo />
 
