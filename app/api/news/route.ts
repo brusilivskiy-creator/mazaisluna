@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, image, date, text, category } = body;
+    const { title, image, date, text, category, navigationCategory } = body;
 
     if (!title || !date || !text) {
       return NextResponse.json(
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       date,
       text,
       category: category || null,
+      navigationCategory: navigationCategory || null,
     });
 
     return NextResponse.json(newNews, { status: 201 });
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, title, image, date, text, category } = body;
+    const { id, title, image, date, text, category, navigationCategory } = body;
 
     if (!id || !title || !date || !text) {
       return NextResponse.json(
@@ -71,6 +72,7 @@ export async function PUT(request: NextRequest) {
       date,
       text,
       category: category || null,
+      navigationCategory: navigationCategory || null,
     });
 
     if (!updated) {
@@ -102,6 +104,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "Failed to delete news" }, { status: 500 });
   }
 }
+
 
 
 

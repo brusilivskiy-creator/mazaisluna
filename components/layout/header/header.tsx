@@ -3,7 +3,6 @@
 import { Logo } from "./logo";
 import { Navigation } from "./navigation";
 import { MobileMenu } from "./mobile-menu";
-import { Search } from "lucide-react";
 
 export function Header() {
   return (
@@ -15,20 +14,8 @@ export function Header() {
     >
       <div className="header-wrapper">
         {/* Мобильная верхняя панель */}
-        <div className="flex items-center justify-between px-fluid-sm py-fluid-sm md:hidden border-b border-white/10">
+        <div className="flex items-center justify-start px-fluid-sm py-fluid-sm md:hidden border-b border-white/10">
           <MobileMenu />
-          <button
-            className="flex items-center gap-2 text-white hover:text-[#ffe358] transition-colors duration-200"
-            aria-label="Пошук"
-          >
-            <Search className="w-5 h-5" />
-            <span
-              className="text-sm font-medium"
-              style={{ fontFamily: "var(--font-proba)" }}
-            >
-              Пошук
-            </span>
-          </button>
         </div>
 
         {/* Основной контент хедера */}

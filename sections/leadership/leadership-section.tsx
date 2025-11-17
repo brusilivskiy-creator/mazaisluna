@@ -14,9 +14,10 @@ interface Leader {
 }
 
 export function LeadershipSection() {
-  // Fetch data on the server - no delay!
-  const leadership = getAllLeadership();
-  const positions = getAllPositions();
+  try {
+    // Fetch data on the server - no delay!
+    const leadership = getAllLeadership();
+    const positions = getAllPositions();
 
   // Enrich leadership data with politician information
   const enrichedLeadership: Leader[] = leadership.map((person) => {
@@ -105,4 +106,22 @@ export function LeadershipSection() {
       </div>
     </section>
   );
+  } catch (error) {
+    console.error("Error rendering LeadershipSection:", error);
+    return (
+      <section className="h-full flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
+          <h2
+            className="font-semibold text-gray-900 mb-fluid-lg text-left pb-fluid-sm border-b border-gray-300 flex-shrink-0"
+            style={{ fontFamily: "var(--font-proba)" }}
+          >
+            Керівництво держави
+          </h2>
+          <p className="text-gray-600" style={{ fontFamily: "var(--font-proba)" }}>
+            Помилка завантаження даних керівництва
+          </p>
+        </div>
+      </section>
+    );
+  }
 }

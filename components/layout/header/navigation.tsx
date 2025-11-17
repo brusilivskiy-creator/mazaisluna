@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { Facebook, Twitter, Youtube } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Головна" },
@@ -26,49 +24,6 @@ export function Navigation() {
                 {link.label}
               </Link>
             ))}
-          </div>
-          <div className="flex items-center gap-fluid-sm">
-            <div className="flex items-center gap-fluid-xs">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/80 hover:text-white transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/80 hover:text-white transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/80 hover:text-white transition-colors"
-                aria-label="YouTube"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
-            </div>
-            <button
-              className="flex items-center gap-fluid-xs text-white hover:text-[#ffe358] transition-colors duration-200"
-              aria-label="Пошук"
-            >
-              <Search className="w-6 h-6" />
-              <span
-                className="font-medium"
-                style={{ fontFamily: "var(--font-proba)", fontSize: "var(--fs-p)" }}
-              >
-                Пошук
-              </span>
-            </button>
           </div>
         </div>
       </div>

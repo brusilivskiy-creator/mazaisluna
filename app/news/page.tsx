@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { News } from "@/lib/news";
+import { getNewsSlug } from "@/lib/utils";
 import { Clock, ArrowLeft } from "lucide-react";
 
 export default function NewsPage() {
@@ -80,10 +81,11 @@ export default function NewsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-fluid-md">
                 {news.map((item) => {
                   const dateInfo = formatDate(item.date);
+                  const slug = getNewsSlug(item.title);
                   return (
                     <Link
                       key={item.id}
-                      href={`/news/${item.id}`}
+                      href={`/news/${slug}`}
                       className="group bg-white border border-gray-300 rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col"
                     >
                       {item.image && (
@@ -152,6 +154,7 @@ export default function NewsPage() {
     </>
   );
 }
+
 
 
 

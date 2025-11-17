@@ -1,33 +1,105 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { News } from "@/lib/news";
+import { getNewsSlug } from "@/lib/utils";
 import { Clock, ArrowLeft } from "lucide-react";
 
 export default function NewsDetailPage() {
   const params = useParams();
-  const newsId = params?.id ? parseInt(params.id as string) : null;
+  const router = useRouter();
+  const slug = params?.slug as string | undefined;
   const [news, setNews] = useState<News | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchNews = async (id: number) => {
-    if (!id || isNaN(id)) {
+  const fetchNews = async (newsSlug: string) => {
+    if (!newsSlug) {
       setLoading(false);
       return;
     }
     
     try {
+      // Декодируем slug из URL (на случай если есть спецсимволы)
+      const decodedSlug = decodeURIComponent(newsSlug);
+      
       const response = await fetch("/api/news");
       if (!response.ok) {
         throw new Error("Failed to fetch news");
       }
       const data = await response.json();
-      const newsItem = data.find((item: News) => item.id === id);
+      
+      // Проверяем, является ли slug числом (старый формат по ID)
+      const isNumericId = /^\d+$/.test(decodedSlug);
+      
+      let newsItem: News | undefined;
+      
+      if (isNumericId) {
+        // Старый формат - ищем по ID и редиректим на slug
+        const newsId = parseInt(decodedSlug, 10);
+        newsItem = data.find((item: News) => item.id === newsId);
+        
+        if (newsItem) {
+          // Редиректим на правильный slug
+          const correctSlug = getNewsSlug(newsItem.title);
+          // Используем replace для замены URL без добавления в историю
+          router.replace(`/news/${correctSlug}`, { scroll: false });
+          return;
+        }
+      } else {
+        // Новый формат - ищем по slug
+        // Сначала пробуем найти точное совпадение
+        for (const item of data) {
+          const itemSlug = getNewsSlug(item.title);
+          if (itemSlug === decodedSlug) {
+            newsItem = item;
+            break;
+          }
+        }
+        
+        // Если не нашли точное совпадение, пробуем найти без учета регистра
+        if (!newsItem) {
+          for (const item of data) {
+            const itemSlug = getNewsSlug(item.title);
+            if (itemSlug.toLowerCase() === decodedSlug.toLowerCase()) {
+              newsItem = item;
+              break;
+            }
+          }
+        }
+        
+        // Если все еще не нашли, пробуем найти по частичному совпадению (без дефисов)
+        if (!newsItem) {
+          const normalizedSlug = decodedSlug.replace(/-/g, '').toLowerCase();
+          for (const item of data) {
+            const itemSlug = getNewsSlug(item.title);
+            const normalizedItemSlug = itemSlug.replace(/-/g, '').toLowerCase();
+            if (normalizedItemSlug === normalizedSlug) {
+              newsItem = item;
+              break;
+            }
+          }
+        }
+        
+        // Последний fallback - поиск по ключевым словам
+        if (!newsItem) {
+          const slugWords = decodedSlug.split('-').filter(w => w.length > 2);
+          if (slugWords.length > 0) {
+            for (const item of data) {
+              const itemSlug = getNewsSlug(item.title);
+              if (slugWords.every(word => itemSlug.includes(word))) {
+                newsItem = item;
+                break;
+              }
+            }
+          }
+        }
+      }
+      
       setNews(newsItem || null);
     } catch (error) {
       console.error("Error fetching news:", error);
@@ -38,12 +110,13 @@ export default function NewsDetailPage() {
   };
 
   useEffect(() => {
-    if (newsId && !isNaN(newsId)) {
-      fetchNews(newsId);
+    if (slug) {
+      fetchNews(slug);
     } else {
       setLoading(false);
     }
-  }, [newsId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, router]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

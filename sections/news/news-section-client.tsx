@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { News } from "@/lib/news";
+import { getNewsSlug } from "@/lib/utils";
 import { Clock } from "lucide-react";
 
 interface NavigationItem {
@@ -19,9 +20,10 @@ interface NewsSectionClientProps {
 export function NewsSectionClient({ news, navigationItems }: NewsSectionClientProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // Фильтруем новости по выбранной категории
-  const filteredNews = activeCategory
-    ? news.filter((item) => item.category === activeCategory)
+  // Фільтруємо новини по вибраній категорії навігації
+  // Якщо activeCategory === null ("Новини Уряду"), показуємо всі новини
+  const filteredNews = activeCategory !== null
+    ? news.filter((item) => item.navigationCategory === activeCategory)
     : news;
 
   // Первые 2 новости с изображениями - большие карточки
@@ -46,11 +48,13 @@ export function NewsSectionClient({ news, navigationItems }: NewsSectionClientPr
         <div className="mb-fluid-lg">
           <nav className="flex items-center gap-fluid-md overflow-x-auto">
             {navigationItems.length > 0 ? (
-              navigationItems.map((item) => {
+              navigationItems.map((item, index) => {
                 const isActive = activeCategory === item.category;
+                // Используем комбинацию category и index для уникального ключа
+                const uniqueKey = item.category !== null ? `category-${item.category}` : `category-all-${index}`;
                 return (
                   <button
-                    key={item.label}
+                    key={uniqueKey}
                     onClick={() => setActiveCategory(item.category)}
                     className={`font-bold transition-colors whitespace-nowrap pb-2 ${
                       isActive
@@ -83,10 +87,11 @@ export function NewsSectionClient({ news, navigationItems }: NewsSectionClientPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-fluid-md items-start">
               {featuredNews.map((item) => {
                 const dateInfo = formatDate(item.date);
+                const slug = getNewsSlug(item.title);
                 return (
                   <Link
                     key={item.id}
-                    href={`/news/${item.id}`}
+                    href={`/news/${slug}`}
                     className="group bg-white overflow-hidden flex flex-col items-start"
                   >
                     {item.image && (
@@ -137,10 +142,11 @@ export function NewsSectionClient({ news, navigationItems }: NewsSectionClientPr
               <div className="mt-fluid-md grid grid-cols-1 md:grid-cols-2 gap-fluid-md">
                 {smallNews.map((item) => {
                   const dateInfo = formatDate(item.date);
+                  const slug = getNewsSlug(item.title);
                   return (
                     <Link
                       key={item.id}
-                      href={`/news/${item.id}`}
+                      href={`/news/${slug}`}
                       className="block bg-white"
                     >
                       <div className="flex-1 flex flex-col w-full">
@@ -183,10 +189,11 @@ export function NewsSectionClient({ news, navigationItems }: NewsSectionClientPr
               <div className="space-y-fluid-sm">
                 {listNews.slice(0, 6).map((item) => {
                   const dateInfo = formatDate(item.date);
+                  const slug = getNewsSlug(item.title);
                   return (
                     <Link
                       key={item.id}
-                      href={`/news/${item.id}`}
+                      href={`/news/${slug}`}
                       className="group block pb-fluid-sm hover:text-[#23527c] transition-colors"
                     >
                       <div

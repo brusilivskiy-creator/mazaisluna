@@ -12,13 +12,15 @@ export default function AdminNewsPage() {
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
   const [newsCategories, setNewsCategories] = useState<string[]>([]);
+  const [navigationCategories, setNavigationCategories] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     image: null as string | null,
     date: new Date().toISOString().split("T")[0],
     text: "",
-    category: "",
+    category: "", // Категорія для новин
+    navigationCategory: "", // Категорія для навігації
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -31,13 +33,21 @@ export default function AdminNewsPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/categories?type=news_category");
-      const data = await response.json();
-      setNewsCategories(data.map((cat: { name: string }) => cat.name));
+      // Отримуємо категорії для новин
+      const newsCatResponse = await fetch("/api/categories?type=news_category");
+      const newsCatData = await newsCatResponse.json();
+      const newsCatNames = newsCatData.map((cat: { name: string }) => cat.name);
+      setNewsCategories(newsCatNames);
+
+      // Отримуємо категорії для навігації
+      const navCatResponse = await fetch("/api/categories?type=news_navigation");
+      const navCatData = await navCatResponse.json();
+      const navCatNames = navCatData.map((cat: { name: string }) => cat.name);
+      setNavigationCategories(navCatNames);
     } catch (error) {
       console.error("Error fetching categories:", error);
       // Fallback к дефолтным категориям
-      setNewsCategories([
+      const defaultNewsCats = [
         "Прем'єр-міністр",
         "Віце-прем'єр-міністр",
         "Енергетика",
@@ -53,7 +63,13 @@ export default function AdminNewsPage() {
         "Сільське господарство",
         "Екологія",
         "Міжнародні відносини",
-      ]);
+      ];
+      const defaultNavCats = [
+        "Новини Парламенту",
+        "Виступи та коментарі",
+      ];
+      setNewsCategories(defaultNewsCats);
+      setNavigationCategories(defaultNavCats);
     }
   };
 
@@ -87,6 +103,7 @@ export default function AdminNewsPage() {
             date: dateISO,
             text: formData.text,
             category: formData.category || null,
+            navigationCategory: formData.navigationCategory || null,
           }),
         });
 
@@ -104,6 +121,7 @@ export default function AdminNewsPage() {
             date: dateISO,
             text: formData.text,
             category: formData.category || null,
+            navigationCategory: formData.navigationCategory || null,
           }),
         });
 
@@ -144,6 +162,7 @@ export default function AdminNewsPage() {
       date: dateStr,
       text: newsItem.text,
       category: newsItem.category || "",
+      navigationCategory: newsItem.navigationCategory || "",
     });
     setImagePreview(newsItem.image);
     setShowForm(true);
@@ -157,6 +176,7 @@ export default function AdminNewsPage() {
       date: new Date().toISOString().split("T")[0],
       text: "",
       category: "",
+      navigationCategory: "",
     });
     setImagePreview(null);
     setShowForm(false);
@@ -330,41 +350,60 @@ export default function AdminNewsPage() {
                           style={{ fontFamily: "var(--font-proba)" }}
                         />
                       </div>
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <div>
                         <label
                           className="block text-sm font-medium text-gray-700 mb-2"
                           style={{ fontFamily: "var(--font-proba)" }}
                         >
-                          Категорія
+                          Категорія для новин
                         </label>
                         <select
-                          value={newsCategories.includes(formData.category) ? formData.category : ""}
+                          value={formData.category}
                           onChange={(e) => {
-                            if (e.target.value) {
-                              setFormData({ ...formData, category: e.target.value });
-                            }
+                            setFormData({ ...formData, category: e.target.value || "" });
                           }}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23527c] focus:border-transparent mb-2"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23527c] focus:border-transparent"
                           style={{ fontFamily: "var(--font-proba)" }}
                         >
-                          <option value="">Виберіть стандартну категорію</option>
+                          <option value="">Не вибрано</option>
                           {newsCategories.map((category) => (
                             <option key={category} value={category}>
                               {category}
                             </option>
                           ))}
                         </select>
-                        <input
-                          type="text"
-                          value={formData.category}
-                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                          placeholder="Або введіть свою категорію"
+                        <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-proba)" }}>
+                          Категорія для класифікації новини
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        >
+                          Категорія для навігації (роздільник)
+                        </label>
+                        <select
+                          value={formData.navigationCategory}
+                          onChange={(e) => {
+                            setFormData({ ...formData, navigationCategory: e.target.value || "" });
+                          }}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23527c] focus:border-transparent"
                           style={{ fontFamily: "var(--font-proba)" }}
-                        />
+                        >
+                          <option value="">Не вибрано</option>
+                          {navigationCategories.map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
+                        </select>
                         <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-proba)" }}>
-                          Оберіть категорію зі списку або введіть свою
+                          Категорія для відображення в роздільниках зверху (таби навігації)
                         </p>
                       </div>
                     </div>
@@ -437,14 +476,24 @@ export default function AdminNewsPage() {
                       >
                         {new Date(newsItem.date).toLocaleDateString("uk-UA")}
                       </p>
-                      {newsItem.category && (
-                        <span
-                          className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded mb-2"
-                          style={{ fontFamily: "var(--font-proba)" }}
-                        >
-                          {newsItem.category}
-                        </span>
-                      )}
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {newsItem.category && (
+                          <span
+                            className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded"
+                            style={{ fontFamily: "var(--font-proba)" }}
+                          >
+                            📰 {newsItem.category}
+                          </span>
+                        )}
+                        {newsItem.navigationCategory && (
+                          <span
+                            className="inline-block px-2 py-1 text-xs bg-green-100 text-green-700 rounded"
+                            style={{ fontFamily: "var(--font-proba)" }}
+                          >
+                            🗂️ {newsItem.navigationCategory}
+                          </span>
+                        )}
+                      </div>
                       <p
                         className="text-sm text-gray-700 line-clamp-3 mb-4"
                         style={{ fontFamily: "var(--font-proba)" }}

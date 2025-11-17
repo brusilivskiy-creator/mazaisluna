@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getNewsSlug } from "./utils";
 
 export interface News {
   id: number;
@@ -7,7 +8,8 @@ export interface News {
   image: string | null;
   date: string; // ISO date string
   text: string;
-  category?: string | null;
+  category?: string | null; // Категорія для новин (news_category)
+  navigationCategory?: string | null; // Категорія для навігації (news_navigation)
 }
 
 const dataFilePath = path.join(process.cwd(), "data", "news.json");
@@ -34,6 +36,14 @@ export function saveNews(news: News[]): void {
 export function getNewsById(id: number): News | undefined {
   const news = getAllNews();
   return news.find((item) => item.id === id);
+}
+
+/**
+ * Находит новость по slug (транслитерированному заголовку)
+ */
+export function getNewsBySlug(slug: string): News | undefined {
+  const news = getAllNews();
+  return news.find((item) => getNewsSlug(item.title) === slug);
 }
 
 export function addNews(newsItem: Omit<News, "id">): News {
@@ -68,6 +78,7 @@ export function getLatestNews(limit: number = 6): News[] {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, limit);
 }
+
 
 
 

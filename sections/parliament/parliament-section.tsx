@@ -6,15 +6,16 @@ import { getAllPoliticians } from "@/lib/politicians";
 import { getParliamentConfig } from "@/lib/parliament";
 
 export function ParliamentSection() {
-  // Fetch data on the server - no delay!
-  const partiesData = getAllParties();
-  const politiciansData = getAllPoliticians();
-  const parliamentData = getParliamentConfig();
+  try {
+    // Fetch data on the server - no delay!
+    const partiesData = getAllParties();
+    const politiciansData = getAllPoliticians();
+    const parliamentData = getParliamentConfig();
 
-  // Filter only parties with seats > 0 for parliament display
-  const parties = partiesData.filter((party: Party) => party.seats > 0);
-  const politicians = politiciansData;
-  const parliamentDiagram = parliamentData.diagram;
+    // Filter only parties with seats > 0 for parliament display
+    const parties = partiesData.filter((party: Party) => party.seats > 0);
+    const politicians = politiciansData;
+    const parliamentDiagram = parliamentData.diagram;
 
   return (
     <section className="h-full flex flex-col">
@@ -41,10 +42,11 @@ export function ParliamentSection() {
 
         {/* Список партий */}
         <div className="auto-grid flex-1 min-h-0 content-start gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
-          {parties.map((party) => {
+          {(() => {
             const totalSeats = parties.reduce((sum, p) => sum + p.seats, 0);
-            const percentage = totalSeats > 0 ? (party.seats / totalSeats) * 100 : 0;
-            const partyColor = party.color || "#23527c";
+            return parties.map((party) => {
+              const percentage = totalSeats > 0 ? (party.seats / totalSeats) * 100 : 0;
+              const partyColor = party.color || "#23527c";
             
             return (
               <div
@@ -94,9 +96,28 @@ export function ParliamentSection() {
                 </div>
               </div>
             );
-          })}
+          });
+          })()}
         </div>
       </div>
     </section>
   );
+  } catch (error) {
+    console.error("Error rendering ParliamentSection:", error);
+    return (
+      <section className="h-full flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
+          <h2
+            className="font-semibold text-gray-900 mb-fluid-md text-left pb-fluid-sm border-b border-gray-300 flex-shrink-0"
+            style={{ fontFamily: "var(--font-proba)" }}
+          >
+            Склад парламенту
+          </h2>
+          <p className="text-gray-600" style={{ fontFamily: "var(--font-proba)" }}>
+            Помилка завантаження даних парламенту
+          </p>
+        </div>
+      </section>
+    );
+  }
 }
