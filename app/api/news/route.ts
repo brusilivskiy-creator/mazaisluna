@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  getAllNews,
-  addNews,
-  updateNews,
-  deleteNews,
-  getLatestNews,
-  type News,
-} from "@/lib/news";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,13 +9,53 @@ export async function GET(request: NextRequest) {
 
     if (latest === "true") {
       const limitNum = limit ? parseInt(limit) : 6;
-      const news = getLatestNews(limitNum);
-      return NextResponse.json(news);
+      const news = await prisma.news.findMany({
+        include: {
+          category: true,
+          navigationCategory: true,
+        },
+        orderBy: {
+          date: 'desc',
+        },
+        take: limitNum,
+      });
+
+      const formatted = news.map((n) => ({
+        id: n.id,
+        title: n.title,
+        image: n.image,
+        date: n.date.toISOString(),
+        text: n.text,
+        category: n.category?.name || null,
+        navigationCategory: n.navigationCategory?.name || null,
+      }));
+
+      return NextResponse.json(formatted);
     }
 
-    const news = getAllNews();
-    return NextResponse.json(news);
+    const news = await prisma.news.findMany({
+      include: {
+        category: true,
+        navigationCategory: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    const formatted = news.map((n) => ({
+      id: n.id,
+      title: n.title,
+      image: n.image,
+      date: n.date.toISOString(),
+      text: n.text,
+      category: n.category?.name || null,
+      navigationCategory: n.navigationCategory?.name || null,
+    }));
+
+    return NextResponse.json(formatted);
   } catch (error) {
+    console.error("Error fetching news:", error);
     return NextResponse.json({ error: "Failed to fetch news" }, { status: 500 });
   }
 }
@@ -39,17 +72,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newNews = addNews({
-      title,
-      image: image || null,
-      date,
-      text,
-      category: category || null,
-      navigationCategory: navigationCategory || null,
+    // Находим ID категорий по имени
+    let categoryId = null;
+    let navigationCategoryId = null;
+
+    if (category) {
+      const cat = await prisma.category.findFirst({
+        where: { name: category, type: 'news_category' },
+      });
+      categoryId = cat?.id || null;
+    }
+
+    if (navigationCategory) {
+      const navCat = await prisma.category.findFirst({
+        where: { name: navigationCategory, type: 'news_navigation' },
+      });
+      navigationCategoryId = navCat?.id || null;
+    }
+
+    const newNews = await prisma.news.create({
+      data: {
+        title,
+        image: image || null,
+        date: new Date(date),
+        text,
+        categoryId,
+        navigationCategoryId,
+      },
+      include: {
+        category: true,
+        navigationCategory: true,
+      },
     });
 
-    return NextResponse.json(newNews, { status: 201 });
+    return NextResponse.json({
+      id: newNews.id,
+      title: newNews.title,
+      image: newNews.image,
+      date: newNews.date.toISOString(),
+      text: newNews.text,
+      category: newNews.category?.name || null,
+      navigationCategory: newNews.navigationCategory?.name || null,
+    }, { status: 201 });
   } catch (error) {
+    console.error("Error adding news:", error);
     return NextResponse.json({ error: "Failed to add news" }, { status: 500 });
   }
 }
@@ -66,21 +132,54 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updated = updateNews(id, {
-      title,
-      image: image || null,
-      date,
-      text,
-      category: category || null,
-      navigationCategory: navigationCategory || null,
-    });
+    // Находим ID категорий по имени
+    let categoryId = null;
+    let navigationCategoryId = null;
 
-    if (!updated) {
-      return NextResponse.json({ error: "News not found" }, { status: 404 });
+    if (category) {
+      const cat = await prisma.category.findFirst({
+        where: { name: category, type: 'news_category' },
+      });
+      categoryId = cat?.id || null;
     }
 
-    return NextResponse.json(updated);
+    if (navigationCategory) {
+      const navCat = await prisma.category.findFirst({
+        where: { name: navigationCategory, type: 'news_navigation' },
+      });
+      navigationCategoryId = navCat?.id || null;
+    }
+
+    const updated = await prisma.news.update({
+      where: { id: parseInt(String(id)) },
+      data: {
+        title,
+        image: image || null,
+        date: new Date(date),
+        text,
+        categoryId,
+        navigationCategoryId,
+      },
+      include: {
+        category: true,
+        navigationCategory: true,
+      },
+    });
+
+    return NextResponse.json({
+      id: updated.id,
+      title: updated.title,
+      image: updated.image,
+      date: updated.date.toISOString(),
+      text: updated.text,
+      category: updated.category?.name || null,
+      navigationCategory: updated.navigationCategory?.name || null,
+    });
   } catch (error) {
+    console.error("Error updating news:", error);
+    if ((error as any).code === 'P2025') {
+      return NextResponse.json({ error: "News not found" }, { status: 404 });
+    }
     return NextResponse.json({ error: "Failed to update news" }, { status: 500 });
   }
 }
@@ -94,18 +193,16 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    const deleted = deleteNews(id);
-    if (!deleted) {
-      return NextResponse.json({ error: "News not found" }, { status: 404 });
-    }
+    await prisma.news.delete({
+      where: { id },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Error deleting news:", error);
+    if ((error as any).code === 'P2025') {
+      return NextResponse.json({ error: "News not found" }, { status: 404 });
+    }
     return NextResponse.json({ error: "Failed to delete news" }, { status: 500 });
   }
 }
-
-
-
-
-
