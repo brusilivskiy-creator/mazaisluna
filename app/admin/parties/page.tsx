@@ -174,16 +174,24 @@ export default function AdminPartiesPage() {
         body: uploadFormData,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setFormData({ ...formData, logo: data.path });
-        setLogoPreview(data.path);
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error("Upload error response:", responseData);
+        alert(`Помилка при завантаженні файлу: ${responseData.error || "Невідома помилка"}`);
+        return;
+      }
+
+      if (responseData.success && responseData.path) {
+        console.log("Upload successful:", responseData.path);
+        setFormData({ ...formData, logo: responseData.path });
+        setLogoPreview(responseData.path);
       } else {
-        alert("Помилка при завантаженні файлу");
+        alert("Помилка: некоректна відповідь від сервера");
       }
     } catch (error) {
       console.error("Error uploading logo:", error);
-      alert("Помилка при завантаженні файлу");
+      alert("Помилка при завантаженні файлу: " + (error instanceof Error ? error.message : "Невідома помилка"));
     } finally {
       setUploadingLogo(false);
     }

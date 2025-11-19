@@ -59,31 +59,79 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log("PUT /api/parties - Request body:", body);
+    
     const { id, name, logo, seats, note, leaderId, color } = body;
 
-    if (!id || !name || seats === undefined) {
-      return NextResponse.json({ error: "ID, name and seats are required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
+
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
+
+    if (seats === undefined || seats === null) {
+      return NextResponse.json({ error: "Seats are required" }, { status: 400 });
+    }
+
+    // Подготовка данных для обновления
+    const updateData: any = {
+      name,
+      seats: typeof seats === "number" ? seats : parseInt(String(seats)) || 0,
+    };
+
+    // Добавляем поля только если они переданы
+    if (logo !== undefined) {
+      updateData.logo = logo || "/images/political-parties/alt.png";
+    }
+    if (note !== undefined) {
+      updateData.note = note || null;
+    }
+    if (leaderId !== undefined) {
+      updateData.leaderId = leaderId ? parseInt(String(leaderId)) : null;
+    }
+    if (color !== undefined) {
+      updateData.color = color || null;
+    }
+
+    console.log("PUT /api/parties - Update data:", updateData);
 
     const updated = await prisma.party.update({
       where: { id: parseInt(String(id)) },
-      data: {
-        name,
-        logo: logo || "/images/political-parties/alt.png",
-        seats: typeof seats === "number" ? seats : parseInt(String(seats)) || 0,
-        note: note || null,
-        leaderId: leaderId ? parseInt(String(leaderId)) : null,
-        color: color || null,
+      data: updateData,
+      include: {
+        leader: true,
       },
     });
 
-    return NextResponse.json(updated);
-  } catch (error) {
+    console.log("PUT /api/parties - Updated party:", updated);
+
+    return NextResponse.json({
+      id: updated.id,
+      name: updated.name,
+      logo: updated.logo,
+      seats: updated.seats,
+      note: updated.note,
+      leaderId: updated.leaderId,
+      color: updated.color,
+    });
+  } catch (error: any) {
     console.error("Error updating party:", error);
-    if ((error as any).code === 'P2025') {
+    console.error("Error details:", {
+      code: error.code,
+      message: error.message,
+      meta: error.meta,
+    });
+    
+    if (error.code === 'P2025') {
       return NextResponse.json({ error: "Party not found" }, { status: 404 });
     }
-    return NextResponse.json({ error: "Failed to update party" }, { status: 500 });
+    
+    return NextResponse.json({ 
+      error: "Failed to update party",
+      details: error.message 
+    }, { status: 500 });
   }
 }
 

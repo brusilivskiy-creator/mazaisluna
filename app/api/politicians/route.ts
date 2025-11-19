@@ -64,23 +64,52 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, name, image, partyId } = body;
+    console.log("PUT /api/politicians - Request body:", body);
+    
+    const { id, name, image, party, partyLogo, partyId } = body;
 
-    if (!id || !name) {
-      return NextResponse.json({ error: "ID and name are required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
+
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
+
+    // Если передано имя партии, находим её ID
+    let finalPartyId: number | null = null;
+    if (partyId) {
+      finalPartyId = parseInt(String(partyId));
+    } else if (party) {
+      const partyRecord = await prisma.party.findFirst({
+        where: { name: party },
+      });
+      finalPartyId = partyRecord?.id || null;
+    }
+
+    const updateData: any = {
+      name,
+    };
+
+    if (image !== undefined) {
+      updateData.image = image || null;
+    }
+
+    if (finalPartyId !== undefined) {
+      updateData.partyId = finalPartyId;
+    }
+
+    console.log("PUT /api/politicians - Update data:", updateData);
 
     const updated = await prisma.politician.update({
       where: { id: parseInt(String(id)) },
-      data: {
-        name,
-        image: image || null,
-        partyId: partyId ? parseInt(String(partyId)) : null,
-      },
+      data: updateData,
       include: {
         party: true,
       },
     });
+
+    console.log("PUT /api/politicians - Updated politician:", updated);
 
     return NextResponse.json({
       id: updated.id,
@@ -89,12 +118,22 @@ export async function PUT(request: NextRequest) {
       party: updated.party?.name || null,
       partyLogo: updated.party?.logo || null,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating politician:", error);
-    if ((error as any).code === 'P2025') {
+    console.error("Error details:", {
+      code: error.code,
+      message: error.message,
+      meta: error.meta,
+    });
+    
+    if (error.code === 'P2025') {
       return NextResponse.json({ error: "Politician not found" }, { status: 404 });
     }
-    return NextResponse.json({ error: "Failed to update politician" }, { status: 500 });
+    
+    return NextResponse.json({ 
+      error: "Failed to update politician",
+      details: error.message 
+    }, { status: 500 });
   }
 }
 

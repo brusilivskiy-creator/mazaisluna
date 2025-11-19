@@ -55,43 +55,48 @@ export default function AdminPoliticiansPage() {
     e.preventDefault();
 
     try {
-      if (editingId) {
-        const response = await fetch("/api/politicians", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: editingId,
-            ...formData,
-            image: formData.image || null,
-            party: formData.party || null,
-            partyLogo: formData.partyLogo || null,
-          }),
-        });
+      // Находим ID партии по имени
+      const selectedParty = parties.find((p) => p.name === formData.party);
+      const partyId = selectedParty?.id || null;
 
-        if (response.ok) {
-          await fetchPoliticians();
-          resetForm();
-        }
-      } else {
-        const response = await fetch("/api/politicians", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...formData,
-            image: formData.image || null,
-            party: formData.party || null,
-            partyLogo: formData.partyLogo || null,
-          }),
-        });
+      const payload: any = {
+        name: formData.name,
+        image: formData.image || null,
+      };
 
-        if (response.ok) {
-          await fetchPoliticians();
-          resetForm();
-        }
+      if (partyId) {
+        payload.partyId = partyId;
+      } else if (formData.party) {
+        payload.party = formData.party;
       }
+
+      if (editingId) {
+        payload.id = editingId;
+      }
+
+      console.log("Submitting politician:", payload);
+
+      const response = await fetch("/api/politicians", {
+        method: editingId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error("Error response:", responseData);
+        alert(`Помилка при збереженні: ${responseData.error || "Невідома помилка"}`);
+        return;
+      }
+
+      console.log("Success response:", responseData);
+      await fetchPoliticians();
+      resetForm();
+      alert(editingId ? "Політика оновлено" : "Політика додано");
     } catch (error) {
       console.error("Error saving politician:", error);
-      alert("Помилка при збереженні");
+      alert("Помилка при збереженні: " + (error instanceof Error ? error.message : "Невідома помилка"));
     }
   };
 
@@ -169,12 +174,20 @@ export default function AdminPoliticiansPage() {
         body: uploadFormData,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setFormData({ ...formData, image: data.path });
-        setImagePreview(data.path);
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error("Upload error response:", responseData);
+        alert(`Помилка при завантаженні файлу: ${responseData.error || "Невідома помилка"}`);
+        return;
+      }
+
+      if (responseData.success && responseData.path) {
+        console.log("Upload successful:", responseData.path);
+        setFormData({ ...formData, image: responseData.path });
+        setImagePreview(responseData.path);
       } else {
-        alert("Помилка при завантаженні файлу");
+        alert("Помилка: некоректна відповідь від сервера");
       }
     } catch (error) {
       console.error("Error uploading image:", error);
