@@ -35,12 +35,16 @@ export function ImageDisplay({
     // Для base64 используем обычный img тег
     if (fill) {
       return (
-        <div className={`relative w-full h-full ${className}`}>
+        <div className={`relative w-full h-full ${className}`} style={{ width: '100%', height: '100%' }}>
           <img
             src={src}
             alt={alt}
-            className={`w-full h-full object-${objectFit}`}
-            style={{ objectFit }}
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: objectFit,
+              display: 'block'
+            }}
             onError={() => setError(true)}
           />
         </div>
@@ -70,7 +74,7 @@ export function ImageDisplay({
 
   if (fill) {
     return (
-      <div className={`relative w-full h-full ${className}`}>
+      <div className={`relative ${className}`} style={{ width: '100%', height: '100%' }}>
         <Image
           src={src}
           alt={alt}
@@ -78,7 +82,7 @@ export function ImageDisplay({
           className={`object-${objectFit}`}
           style={{ objectFit }}
           onError={() => setError(true)}
-          unoptimized={src.startsWith('/') && !src.startsWith('/images')}
+          unoptimized={src.startsWith('/')}
         />
       </div>
     );
