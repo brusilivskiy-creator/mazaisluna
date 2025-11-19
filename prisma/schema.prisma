@@ -32,7 +32,7 @@ model Category {
 model Party {
   id        Int      @id @default(autoincrement())
   name      String   @unique
-  logo      String
+  logo      String   @db.Text  // Може містити base64 або URL
   seats     Int      @default(0)
   note      String?  @db.Text
   color     String?
@@ -54,7 +54,7 @@ model Party {
 model Politician {
   id        Int      @id @default(autoincrement())
   name      String
-  image     String?
+  image     String?  @db.Text  // Може містити base64 або URL
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -108,7 +108,7 @@ model Leadership {
 model News {
   id                 Int      @id @default(autoincrement())
   title              String   @db.Text
-  image              String?
+  image              String?  @db.Text  // Може містити base64 або URL
   date               DateTime
   text               String   @db.Text
   categoryId         Int?
@@ -130,7 +130,7 @@ model News {
 model Parliament {
   id        Int      @id @default(autoincrement())
   date      DateTime
-  diagram   String?
+  diagram   String?  @db.Text  // Може містити base64 або URL
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

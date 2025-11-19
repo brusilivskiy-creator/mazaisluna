@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 
 export default function AdminPoliticiansPage() {
   const [politicians, setPoliticians] = useState<Politician[]>([]);
@@ -182,8 +182,14 @@ export default function AdminPoliticiansPage() {
         return;
       }
 
-      if (responseData.success && responseData.path) {
+      if (responseData.success && responseData.dataUrl) {
         console.log("Upload successful:", responseData.path);
+        // Используем dataUrl (base64) для сохранения в базе данных
+        setFormData({ ...formData, image: responseData.dataUrl });
+        setImagePreview(responseData.dataUrl);
+      } else if (responseData.success && responseData.path) {
+        // Fallback для обратной совместимости
+        console.log("Upload successful (legacy):", responseData.path);
         setFormData({ ...formData, image: responseData.path });
         setImagePreview(responseData.path);
       } else {
@@ -296,11 +302,11 @@ export default function AdminPoliticiansPage() {
                             Попередній перегляд:
                           </p>
                           <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-300">
-                            <Image
+                            <ImageDisplay
                               src={imagePreview || formData.image}
                               alt="Попередній перегляд"
                               fill
-                              className="object-cover"
+                              objectFit="cover"
                             />
                           </div>
                         </div>
@@ -359,11 +365,11 @@ export default function AdminPoliticiansPage() {
                     <div className="flex-1 mb-4">
                       {politician.image && (
                         <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 mb-3">
-                          <Image
+                          <ImageDisplay
                             src={politician.image}
                             alt={politician.name}
                             fill
-                            className="object-cover"
+                            objectFit="cover"
                           />
                         </div>
                       )}
@@ -377,10 +383,12 @@ export default function AdminPoliticiansPage() {
                         <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
                           {politician.partyLogo && (
                             <div className="relative w-6 h-6 flex-shrink-0 rounded overflow-hidden bg-white border border-gray-200">
-                              <Image
+                              <ImageDisplay
                                 src={politician.partyLogo}
                                 alt={politician.party}
                                 width={24}
+                                height={24}
+                                objectFit="contain"
                                 height={24}
                                 className="w-full h-full object-contain p-0.5"
                               />

@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 
 const AVAILABLE_LOGOS = [
   "/images/political-parties/pa.png",
@@ -182,8 +182,14 @@ export default function AdminPartiesPage() {
         return;
       }
 
-      if (responseData.success && responseData.path) {
+      if (responseData.success && responseData.dataUrl) {
         console.log("Upload successful:", responseData.path);
+        // Используем dataUrl (base64) для сохранения в базе данных
+        setFormData({ ...formData, logo: responseData.dataUrl });
+        setLogoPreview(responseData.dataUrl);
+      } else if (responseData.success && responseData.path) {
+        // Fallback для обратной совместимости
+        console.log("Upload successful (legacy):", responseData.path);
         setFormData({ ...formData, logo: responseData.path });
         setLogoPreview(responseData.path);
       } else {
@@ -296,11 +302,12 @@ export default function AdminPartiesPage() {
                             Попередній перегляд:
                           </p>
                           <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-300">
-                            <Image
+                            <ImageDisplay
                               src={logoPreview || formData.logo}
                               alt="Попередній перегляд"
                               fill
-                              className="object-contain p-2"
+                              objectFit="contain"
+                              className="p-2"
                             />
                           </div>
                         </div>
@@ -401,12 +408,13 @@ export default function AdminPartiesPage() {
                     >
                       <div className="flex items-center gap-3 mb-4">
                         <div className="relative w-12 h-12 flex-shrink-0">
-                          <Image
+                          <ImageDisplay
                             src={party.logo}
                             alt={party.name}
                             width={48}
                             height={48}
-                            className="w-full h-full object-contain"
+                            className="w-full h-full"
+                            objectFit="contain"
                           />
                         </div>
                         <div className="flex-1">
