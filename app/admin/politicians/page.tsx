@@ -389,7 +389,6 @@ export default function AdminPoliticiansPage() {
                                 width={24}
                                 height={24}
                                 objectFit="contain"
-                                height={24}
                                 className="w-full h-full object-contain p-0.5"
                               />
                             </div>
