@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -199,11 +199,11 @@ export default function NewsDetailPage() {
               <article className="max-w-4xl mx-auto">
                 {news.image && (
                   <div className="relative w-full h-96 mb-fluid-lg rounded-lg overflow-hidden bg-gray-100">
-                    <Image
+                    <ImageDisplay
                       src={news.image}
                       alt={news.title}
                       fill
-                      className="object-cover"
+                      objectFit="cover"
                     />
                   </div>
                 )}

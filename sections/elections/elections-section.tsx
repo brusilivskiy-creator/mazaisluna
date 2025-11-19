@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 import { ElectionsData } from "@/lib/elections";
 import { Party } from "@/lib/parties";
 import { Politician } from "@/lib/politicians";
@@ -196,12 +196,13 @@ export function ElectionsSection() {
                         <div className="flex items-center gap-fluid-sm mb-fluid-xs">
                           {partyLogo && (
                             <div className="relative flex-shrink-0 flex items-center justify-center" style={{ width: 'clamp(2.5rem, 5vw, 3rem)', height: 'clamp(2.5rem, 5vw, 3rem)' }}>
-                              <Image
+                              <ImageDisplay
                                 src={partyLogo}
                                 alt={partyResult.partyName}
                                 width={48}
                                 height={48}
-                                className="w-full h-full object-contain"
+                                objectFit="contain"
+                                className="w-full h-full"
                               />
                             </div>
                           )}

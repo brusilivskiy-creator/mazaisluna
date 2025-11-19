@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -90,11 +90,12 @@ export default function NewsPage() {
                     >
                       {item.image && (
                         <div className="relative w-full h-48 overflow-hidden bg-gray-100">
-                          <Image
+                          <ImageDisplay
                             src={item.image}
                             alt={item.title}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            objectFit="cover"
+                            className="group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                       )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 import Link from "next/link";
 import { News } from "@/lib/news";
 import { getNewsSlug } from "@/lib/utils";
@@ -96,12 +96,12 @@ export function NewsSectionClient({ news, navigationItems }: NewsSectionClientPr
                   >
                     {item.image && (
                       <div className="relative w-full overflow-hidden bg-gray-100 flex-shrink-0" style={{ height: '12rem', width: '100%' }}>
-                        <Image
+                        <ImageDisplay
                           src={item.image}
                           alt={item.title}
                           fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 50vw"
+                          objectFit="cover"
+                          className=""
                         />
                       </div>
                     )}

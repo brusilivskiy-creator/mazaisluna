@@ -5,7 +5,7 @@ import { ParliamentSection } from "@/sections/parliament";
 import { LeadershipSection } from "@/sections/leadership";
 import { NewsSection } from "@/sections/news/news-section";
 
-export default function Home() {
+export default async function Home() {
   return (
     <>
       <Header />

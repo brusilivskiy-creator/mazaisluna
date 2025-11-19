@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ParliamentSection } from "@/sections/parliament";
 
-export default function ParliamentPage() {
+export default async function ParliamentPage() {
   return (
     <>
       <Header />
