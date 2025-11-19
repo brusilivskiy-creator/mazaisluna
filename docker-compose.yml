@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mazais-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: mazais
+      POSTGRES_PASSWORD: mazais_password
+      POSTGRES_DB: mazais
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+

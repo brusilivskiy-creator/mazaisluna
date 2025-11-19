@@ -9,6 +9,8 @@
 - **Tailwind CSS** - Стилізація
 - **shadcn/ui** - UI компоненти
 - **Lucide React** - Іконки
+- **Prisma 6** - ORM для роботи з базою даних
+- **PostgreSQL** - База даних (Prisma Remote)
 
 ## Функціональність
 
@@ -44,7 +46,26 @@ npm install
 yarn install
 ```
 
-### Крок 3: Запуск development сервера
+### Крок 3: Налаштування бази даних
+
+1. **Створіть базу даних в Prisma Remote:**
+   - Перейдіть на [console.prisma.io](https://console.prisma.io)
+   - Створіть новий проект
+   - Скопіюйте Connection String
+
+2. **Налаштуйте змінні оточення:**
+   ```bash
+   cp .env.example .env
+   ```
+   Відредагуйте `.env` файл і вставте ваш `DATABASE_URL` з Prisma Remote.
+
+3. **Застосуйте схему та заповніть базу даних:**
+   ```bash
+   npm run db:push    # Застосувати схему
+   npm run db:seed    # Заповнити даними
+   ```
+
+### Крок 4: Запуск development сервера
 ```bash
 npm run dev
 # або
@@ -108,19 +129,47 @@ mazais/
 ├── components/            # React компоненти
 ├── sections/              # Секції сторінок
 ├── lib/                   # Утиліти та бібліотеки
-├── data/                  # JSON дані (політики, партії, посади)
-└── public/                # Статичні файли (зображення, шрифти)
+│   └── prisma.ts         # Prisma Client instance
+├── prisma/               # Prisma схема та міграції
+│   ├── schema.prisma     # Схема бази даних
+│   └── seed.ts           # Скрипт для заповнення даними
+├── data/                 # JSON дані (використовуються для seed)
+└── public/               # Статичні файли (зображення, шрифти)
 ```
 
-## Дані
+## База даних
 
-Дані зберігаються в JSON файлах у папці `data/`:
-- `politicians.json` - Список політиків (ім'я, фото, партія)
-- `positions.json` - Список посад з ієрархією (поле `order`)
-- `parties.json` - Список партій (назва, логотип, кількість мандатів)
-- `leadership.json` - Призначення політиків на посади
+Проєкт використовує **Prisma** з **PostgreSQL** базою даних (Prisma Remote).
 
-**Важливо**: Ці файли мають бути включені в репозиторій для роботи сайту. Вони НЕ ігноруються `.gitignore`.
+### Структура бази даних
+
+- **Category** - Категорії новин та навігації
+- **News** - Новости
+- **Party** - Політичні партії
+- **Politician** - Політики
+- **Position** - Посади
+- **Leadership** - Зв'язок політиків з посадами
+- **Parliament** - Парламентські вибори
+- **ParliamentResult** - Результати партій на виборах
+- **MajoritarianDistrict** - Мажоритарні округи
+- **LeaderElection** - Вибори провідника
+- **LeaderElectionResult** - Результати виборів провідника
+
+### Команди для роботи з базою даних
+
+```bash
+npm run db:generate  # Генерація Prisma Client
+npm run db:push      # Застосування схеми (без міграцій)
+npm run db:migrate   # Створення та застосування міграцій
+npm run db:seed      # Заповнення бази даних даними
+npm run db:studio    # Відкрити Prisma Studio (http://localhost:5555)
+```
+
+### Налаштування для production
+
+Для деплою на GitHub/Vercel/Netlify додайте змінну оточення `DATABASE_URL` у налаштуваннях вашого хостингу.
+
+**Важливо**: Ніколи не комітьте `.env` файл з реальним `DATABASE_URL` в репозиторій!
 
 ## Ліцензія
 

@@ -1,0 +1,219 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Категорії для новин та навігації
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  type        String  // "news_category" або "news_navigation"
+  order       Int
+  description String? @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Зв'язки
+  newsItems           News[] @relation("NewsCategory")
+  navigationNewsItems News[] @relation("NewsNavigationCategory")
+
+  @@index([type, order])
+  @@map("categories")
+}
+
+// Політичні партії
+model Party {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  logo      String
+  seats     Int      @default(0)
+  note      String?  @db.Text
+  color     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Зв'язки
+  leaderId      Int? @unique
+  leader        Politician? @relation("PartyLeader", fields: [leaderId], references: [id], onDelete: SetNull)
+  politicians   Politician[]
+  parliamentResults ParliamentResult[]
+  majoritarianDistricts MajoritarianDistrict[]
+  leaderElectionResults LeaderElectionResult[]
+
+  @@map("parties")
+}
+
+// Політики
+model Politician {
+  id        Int      @id @default(autoincrement())
+  name      String
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Зв'язки
+  partyId   Int?
+  party     Party?  @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  leadingParty Party? @relation("PartyLeader")
+  leadership Leadership[]
+  majoritarianDistricts MajoritarianDistrict[]
+  leaderElectionResults LeaderElectionResult[]
+
+  @@index([partyId])
+  @@map("politicians")
+}
+
+// Посади (міністри, прем'єр-міністр тощо)
+model Position {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  category  String?
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Зв'язки
+  leadership Leadership[]
+
+  @@index([order])
+  @@map("positions")
+}
+
+// Керівництво (зв'язок політиків з посадами)
+model Leadership {
+  id          Int      @id @default(autoincrement())
+  politicianId Int
+  positionId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Зв'язки
+  politician   Politician @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+  position     Position   @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@unique([politicianId, positionId])
+  @@index([politicianId])
+  @@index([positionId])
+  @@map("leadership")
+}
+
+// Новини
+model News {
+  id                 Int      @id @default(autoincrement())
+  title              String   @db.Text
+  image              String?
+  date               DateTime
+  text               String   @db.Text
+  categoryId         Int?
+  navigationCategoryId Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Зв'язки
+  category           Category? @relation("NewsCategory", fields: [categoryId], references: [id], onDelete: SetNull)
+  navigationCategory Category? @relation("NewsNavigationCategory", fields: [navigationCategoryId], references: [id], onDelete: SetNull)
+
+  @@index([date])
+  @@index([categoryId])
+  @@index([navigationCategoryId])
+  @@map("news")
+}
+
+// Парламентські вибори
+model Parliament {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  diagram   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Зв'язки
+  results   ParliamentResult[]
+  districts MajoritarianDistrict[]
+
+  @@map("parliament")
+}
+
+// Результати партій на парламентських виборах
+model ParliamentResult {
+  id         Int      @id @default(autoincrement())
+  parliamentId Int
+  partyId    Int
+  percentage Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Зв'язки
+  parliament Parliament @relation(fields: [parliamentId], references: [id], onDelete: Cascade)
+  party      Party      @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@unique([parliamentId, partyId])
+  @@index([parliamentId])
+  @@index([partyId])
+  @@map("parliament_results")
+}
+
+// Мажоритарні округи
+model MajoritarianDistrict {
+  id           Int      @id @default(autoincrement())
+  parliamentId Int
+  districtNumber Int
+  candidateId  Int
+  partyId      Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Зв'язки
+  parliament   Parliament @relation(fields: [parliamentId], references: [id], onDelete: Cascade)
+  candidate    Politician @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  party        Party      @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@unique([parliamentId, districtNumber])
+  @@index([parliamentId])
+  @@index([candidateId])
+  @@index([partyId])
+  @@map("majoritarian_districts")
+}
+
+// Вибори провідника (лідера)
+model LeaderElection {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Зв'язки
+  results   LeaderElectionResult[]
+
+  @@map("leader_elections")
+}
+
+// Результати виборів провідника
+model LeaderElectionResult {
+  id              Int      @id @default(autoincrement())
+  leaderElectionId Int
+  candidateId     Int
+  partyId         Int?
+  percentage      Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Зв'язки
+  leaderElection  LeaderElection @relation(fields: [leaderElectionId], references: [id], onDelete: Cascade)
+  candidate       Politician      @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  party           Party?          @relation(fields: [partyId], references: [id], onDelete: SetNull)
+
+  @@unique([leaderElectionId, candidateId])
+  @@index([leaderElectionId])
+  @@index([candidateId])
+  @@index([partyId])
+  @@map("leader_election_results")
+}
+
