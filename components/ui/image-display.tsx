@@ -24,7 +24,7 @@ export function ImageDisplay({
 }: ImageDisplayProps) {
   const [error, setError] = useState(false);
 
-  if (!src) {
+  if (!src || src.trim() === "") {
     return null;
   }
 
@@ -35,12 +35,12 @@ export function ImageDisplay({
     // Для base64 используем обычный img тег
     if (fill) {
       return (
-        <div className={`relative ${className}`}>
+        <div className={`relative w-full h-full ${className}`}>
           <img
             src={src}
             alt={alt}
-            className={`object-${objectFit} ${className}`}
-            style={{ width: '100%', height: '100%' }}
+            className={`w-full h-full object-${objectFit}`}
+            style={{ objectFit }}
             onError={() => setError(true)}
           />
         </div>
@@ -53,6 +53,7 @@ export function ImageDisplay({
         width={width}
         height={height}
         className={className}
+        style={{ objectFit }}
         onError={() => setError(true)}
       />
     );
@@ -69,13 +70,15 @@ export function ImageDisplay({
 
   if (fill) {
     return (
-      <div className={`relative ${className}`}>
+      <div className={`relative w-full h-full ${className}`}>
         <Image
           src={src}
           alt={alt}
           fill
           className={`object-${objectFit}`}
+          style={{ objectFit }}
           onError={() => setError(true)}
+          unoptimized={src.startsWith('/') && !src.startsWith('/images')}
         />
       </div>
     );
@@ -88,7 +91,9 @@ export function ImageDisplay({
       width={width || 200}
       height={height || 200}
       className={className}
+      style={{ objectFit }}
       onError={() => setError(true)}
+      unoptimized={src.startsWith('/') && !src.startsWith('/images')}
     />
   );
 }
