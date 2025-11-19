@@ -357,11 +357,11 @@ export function ElectionsSection() {
                       <div className="flex items-center gap-fluid-sm mb-fluid-xs">
                         {candidateImage && (
                           <div className="relative flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100" style={{ width: 'clamp(3rem, 7vw, 3.5rem)', height: 'clamp(3rem, 7vw, 3.5rem)' }}>
-                            <Image
+                            <ImageDisplay
                               src={candidateImage}
                               alt={candidate.candidateName}
                               fill
-                              className="object-cover"
+                              objectFit="cover"
                             />
                           </div>
                         )}
@@ -377,12 +377,13 @@ export function ElectionsSection() {
                               <div className="flex items-center gap-2">
                                 {candidatePartyLogo && (
                                   <div className="relative flex-shrink-0 flex items-center justify-center rounded overflow-hidden bg-white border border-gray-200" style={{ width: 'clamp(1.5rem, 3vw, 1.75rem)', height: 'clamp(1.5rem, 3vw, 1.75rem)' }}>
-                                    <Image
+                                    <ImageDisplay
                                       src={candidatePartyLogo}
                                       alt={candidateParty}
                                       width={28}
                                       height={28}
-                                      className="w-full h-full object-contain p-1"
+                                      objectFit="contain"
+                                      className="p-1"
                                     />
                                   </div>
                                 )}
