@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 // Хардкоджений логін і пароль (можна винести в змінні оточення)
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_USERNAME = "administrator";
+const ADMIN_PASSWORD = "MazaisSecure2024!";
 
 export async function POST(request: NextRequest) {
   try {
