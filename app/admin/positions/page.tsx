@@ -19,10 +19,6 @@ export default function AdminPositionsPage() {
   const [showForm, setShowForm] = useState(false);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchPositions();
-  }, []);
-
   const fetchPositions = useCallback(async () => {
     try {
       const response = await fetch("/api/positions");

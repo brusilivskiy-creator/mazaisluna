@@ -26,10 +26,6 @@ export default function AdminCategoriesPage() {
   });
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const fetchCategories = useCallback(async () => {
     try {
       const response = await fetch("/api/categories");
