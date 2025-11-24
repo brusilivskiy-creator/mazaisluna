@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Category } from "@/lib/categories";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -30,7 +30,7 @@ export default function AdminCategoriesPage() {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await fetch("/api/categories");
       const data = await response.json();
@@ -40,9 +40,13 @@ export default function AdminCategoriesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -80,9 +84,9 @@ export default function AdminCategoriesPage() {
       console.error("Error saving category:", error);
       alert("Помилка при збереженні");
     }
-  };
+  }, [editingId, formData, fetchCategories]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Ви впевнені, що хочете видалити цю рубрику?")) return;
 
     try {
@@ -97,9 +101,9 @@ export default function AdminCategoriesPage() {
       console.error("Error deleting category:", error);
       alert("Помилка при видаленні");
     }
-  };
+  }, [fetchCategories]);
 
-  const handleEdit = (category: Category) => {
+  const handleEdit = useCallback((category: Category) => {
     setEditingId(category.id);
     setFormData({
       name: category.name,
@@ -109,9 +113,9 @@ export default function AdminCategoriesPage() {
     });
     setActiveTab(category.type);
     setShowForm(true);
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEditingId(null);
     setFormData({
       name: "",
@@ -120,9 +124,11 @@ export default function AdminCategoriesPage() {
       description: "",
     });
     setShowForm(false);
-  };
+  }, []);
 
-  const filteredCategories = categories.filter((cat) => cat.type === activeTab);
+  const filteredCategories = useMemo(() => {
+    return categories.filter((cat) => cat.type === activeTab);
+  }, [categories, activeTab]);
 
   if (loading) {
     return (

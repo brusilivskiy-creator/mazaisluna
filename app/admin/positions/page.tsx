@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Position } from "@/lib/positions";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -23,7 +23,7 @@ export default function AdminPositionsPage() {
     fetchPositions();
   }, []);
 
-  const fetchPositions = async () => {
+  const fetchPositions = useCallback(async () => {
     try {
       const response = await fetch("/api/positions");
       const data = await response.json();
@@ -33,9 +33,13 @@ export default function AdminPositionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchPositions();
+  }, [fetchPositions]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -73,9 +77,9 @@ export default function AdminPositionsPage() {
       console.error("Error saving position:", error);
       alert("Помилка при збереженні");
     }
-  };
+  }, [editingId, formData, fetchPositions]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Ви впевнені, що хочете видалити цю посаду?")) return;
 
     try {
@@ -90,20 +94,20 @@ export default function AdminPositionsPage() {
       console.error("Error deleting position:", error);
       alert("Помилка при видаленні");
     }
-  };
+  }, [fetchPositions]);
 
-  const handleDragStart = (e: React.DragEvent, id: number) => {
+  const handleDragStart = useCallback((e: React.DragEvent, id: number) => {
     setDraggedItem(id);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/html", id.toString());
-  };
+  }, []);
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
-  };
+  }, []);
 
-  const handleDrop = async (e: React.DragEvent, targetId: number) => {
+  const handleDrop = useCallback(async (e: React.DragEvent, targetId: number) => {
     e.preventDefault();
     
     if (!draggedItem || draggedItem === targetId) {
@@ -154,26 +158,26 @@ export default function AdminPositionsPage() {
       alert("Помилка при збереженні порядку");
       await fetchPositions(); // Відновлюємо з сервера у разі помилки
     }
-  };
+  }, [draggedItem, positions, fetchPositions]);
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setDraggedItem(null);
-  };
+  }, []);
 
-  const handleEdit = (position: Position) => {
+  const handleEdit = useCallback((position: Position) => {
     setEditingId(position.id);
     setFormData({
       name: position.name,
       category: position.category || "",
     });
     setShowForm(true);
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEditingId(null);
     setFormData({ name: "", category: "" });
     setShowForm(false);
-  };
+  }, []);
 
   if (loading) {
     return (
