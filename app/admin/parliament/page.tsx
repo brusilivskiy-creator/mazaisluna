@@ -121,12 +121,11 @@ export default function AdminParliamentPage() {
       if (response.ok) {
         await fetchData();
       }
-      }
     } catch (error) {
       console.error("Error deleting party:", error);
       alert("Помилка при видаленні");
     }
-  };
+  }, [parties, fetchData]);
 
   const handleEdit = useCallback((party: Party) => {
     setEditingId(party.id);
