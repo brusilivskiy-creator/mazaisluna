@@ -118,8 +118,9 @@ export default function AdminParliamentPage() {
           }),
         });
 
-      if (response.ok) {
-        await fetchData();
+        if (response.ok) {
+          await fetchData();
+        }
       }
     } catch (error) {
       console.error("Error deleting party:", error);
