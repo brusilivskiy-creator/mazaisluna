@@ -35,6 +35,12 @@ export default function AdminPositionsPage() {
     fetchPositions();
   }, [fetchPositions]);
 
+  const resetForm = useCallback(() => {
+    setEditingId(null);
+    setFormData({ name: "", category: "" });
+    setShowForm(false);
+  }, []);
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,7 +79,7 @@ export default function AdminPositionsPage() {
       console.error("Error saving position:", error);
       alert("Помилка при збереженні");
     }
-  }, [editingId, formData, fetchPositions]);
+  }, [editingId, formData, fetchPositions, resetForm]);
 
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Ви впевнені, що хочете видалити цю посаду?")) return;
@@ -167,12 +173,6 @@ export default function AdminPositionsPage() {
       category: position.category || "",
     });
     setShowForm(true);
-  }, []);
-
-  const resetForm = useCallback(() => {
-    setEditingId(null);
-    setFormData({ name: "", category: "" });
-    setShowForm(false);
   }, []);
 
   if (loading) {
