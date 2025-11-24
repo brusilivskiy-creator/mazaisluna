@@ -8,8 +8,6 @@ const nextConfig: NextConfig = {
     unoptimized: false,
     formats: ["image/avif", "image/webp"], // Використовуємо сучасні формати для швидшого завантаження
   },
-  // Configure Turbopack
-  turbopack: {},
   // Improve error handling
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,

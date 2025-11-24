@@ -177,7 +177,15 @@ export default function AdminPartiesPage() {
     e.preventDefault();
 
     try {
-      const payload = {
+      const payload: {
+        name: string;
+        logo: string;
+        seats: number;
+        note: string | null;
+        leaderId: number | null;
+        color: string | null;
+        id?: number;
+      } = {
         ...formData,
         seats: parseInt(formData.seats.toString()) || 0,
         note: formData.note || null,
