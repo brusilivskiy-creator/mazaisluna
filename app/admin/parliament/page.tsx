@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Party } from "@/lib/parties";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 
 const AVAILABLE_LOGOS = [
   "/images/political-parties/pa.png",
@@ -31,36 +31,34 @@ export default function AdminParliamentPage() {
   const [parliamentDiagram, setParliamentDiagram] = useState<string | null>(null);
   const [uploadingDiagram, setUploadingDiagram] = useState(false);
 
-  useEffect(() => {
-    fetchParties();
-    fetchParliamentConfig();
-  }, []);
-
-  const fetchParliamentConfig = async () => {
+  // Оптимізоване завантаження даних - паралельні запити
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/parliament");
-      const data = await response.json();
-      setParliamentDiagram(data.diagram);
-    } catch (error) {
-      console.error("Error fetching parliament config:", error);
-    }
-  };
+      const [partiesResponse, parliamentResponse] = await Promise.all([
+        fetch("/api/parties"),
+        fetch("/api/parliament"),
+      ]);
 
-  const fetchParties = async () => {
-    try {
-      const response = await fetch("/api/parties");
-      const data = await response.json();
-      // Показуємо тільки партії з мандатами > 0
-      const partiesWithSeats = data.filter((party: Party) => party.seats > 0);
+      const partiesData = await partiesResponse.json();
+      const partiesList = partiesData.data || partiesData;
+      const partiesWithSeats = partiesList.filter((party: Party) => party.seats > 0);
       setParties(partiesWithSeats);
+
+      const parliamentData = await parliamentResponse.json();
+      setParliamentDiagram(parliamentData.diagram);
     } catch (error) {
-      console.error("Error fetching parties:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -77,7 +75,7 @@ export default function AdminParliamentPage() {
         });
 
         if (response.ok) {
-          await fetchParties();
+          await fetchData();
           resetForm();
         }
       } else {
@@ -92,7 +90,7 @@ export default function AdminParliamentPage() {
         });
 
         if (response.ok) {
-          await fetchParties();
+          await fetchData();
           resetForm();
         }
       }
@@ -100,9 +98,9 @@ export default function AdminParliamentPage() {
       console.error("Error saving party:", error);
       alert("Помилка при збереженні");
     }
-  };
+  }, [formData, editingId, fetchData]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Ви впевнені, що хочете видалити цю партію з парламенту? Мандати будуть встановлені в 0.")) return;
 
     try {
@@ -120,9 +118,9 @@ export default function AdminParliamentPage() {
           }),
         });
 
-        if (response.ok) {
-          await fetchParties();
-        }
+      if (response.ok) {
+        await fetchData();
+      }
       }
     } catch (error) {
       console.error("Error deleting party:", error);
@@ -130,7 +128,7 @@ export default function AdminParliamentPage() {
     }
   };
 
-  const handleEdit = (party: Party) => {
+  const handleEdit = useCallback((party: Party) => {
     setEditingId(party.id);
     setFormData({
       name: party.name,
@@ -139,15 +137,15 @@ export default function AdminParliamentPage() {
       note: party.note || "",
     });
     setShowForm(true);
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEditingId(null);
     setFormData({ name: "", logo: "/images/political-parties/alt.png", seats: 0, note: "" });
     setShowForm(false);
-  };
+  }, []);
 
-  const handleDiagramUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDiagramUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -201,9 +199,9 @@ export default function AdminParliamentPage() {
     } finally {
       setUploadingDiagram(false);
     }
-  };
+  }, []);
 
-  const handleRemoveDiagram = async () => {
+  const handleRemoveDiagram = useCallback(async () => {
     if (!confirm("Ви впевнені, що хочете видалити діаграму?")) return;
 
     try {
@@ -223,7 +221,7 @@ export default function AdminParliamentPage() {
       console.error("Error removing diagram:", error);
       alert("Помилка при видаленні діаграми");
     }
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -283,7 +281,7 @@ export default function AdminParliamentPage() {
                 <div className="space-y-4">
                   {parliamentDiagram && (
                     <div className="relative">
-                      <Image
+                      <ImageDisplay
                         src={parliamentDiagram}
                         alt="Діаграма парламенту"
                         width={800}
@@ -435,7 +433,7 @@ export default function AdminParliamentPage() {
                   >
                     <div className="flex items-center gap-3 mb-4">
                       <div className="relative w-12 h-12 flex-shrink-0">
-                        <Image
+                        <ImageDisplayDisplay
                           src={party.logo}
                           alt={party.name}
                           width={48}

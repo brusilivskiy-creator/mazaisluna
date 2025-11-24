@@ -6,6 +6,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get("limit");
     const latest = searchParams.get("latest");
+    const page = searchParams.get("page");
+    const admin = searchParams.get("admin"); // Для адмін-панелі - не завантажуємо повний текст
 
     if (latest === "true") {
       const limitNum = limit ? parseInt(limit) : 6;
@@ -33,6 +35,49 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(formatted);
     }
 
+    // Підтримка пагінації
+    if (page) {
+      const pageNum = parseInt(page) || 1;
+      const limitNum = limit ? parseInt(limit) : 25;
+      const skip = (pageNum - 1) * limitNum;
+
+      // Отримуємо загальну кількість для пагінації
+      const total = await prisma.news.count();
+
+      const news = await prisma.news.findMany({
+        include: {
+          category: true,
+          navigationCategory: true,
+        },
+        orderBy: {
+          date: 'desc',
+        },
+        skip,
+        take: limitNum,
+      });
+
+      const formatted = news.map((n) => ({
+        id: n.id,
+        title: n.title,
+        image: n.image,
+        date: n.date.toISOString(),
+        text: n.text, // Повний текст для адмін-панелі
+        category: n.category?.name || null,
+        navigationCategory: n.navigationCategory?.name || null,
+      }));
+
+      return NextResponse.json({
+        data: formatted,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    }
+
+    // Без пагінації (для зворотної сумісності)
     const news = await prisma.news.findMany({
       include: {
         category: true,

@@ -1,12 +1,108 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { News } from "@/lib/news";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+// Мемоізований компонент картки новини
+const NewsCard = memo(({ 
+  newsItem, 
+  onEdit, 
+  onDelete 
+}: { 
+  newsItem: News; 
+  onEdit: (item: News) => void;
+  onDelete: (id: number) => void;
+}) => {
+  const handleEdit = useCallback(() => {
+    onEdit(newsItem);
+  }, [newsItem, onEdit]);
+
+  const handleDelete = useCallback(() => {
+    onDelete(newsItem.id);
+  }, [newsItem.id, onDelete]);
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col">
+      {newsItem.image && (
+        <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-100">
+          <ImageDisplay
+            src={newsItem.image}
+            alt={newsItem.title}
+            fill
+            objectFit="cover"
+          />
+        </div>
+      )}
+      <h3
+        className="text-lg font-bold text-gray-900 mb-2 line-clamp-2"
+        style={{ fontFamily: "var(--font-proba)" }}
+      >
+        {newsItem.title}
+      </h3>
+      <p
+        className="text-sm text-gray-600 mb-2"
+        style={{ fontFamily: "var(--font-proba)" }}
+      >
+        {new Date(newsItem.date).toLocaleDateString("uk-UA")}
+      </p>
+      <div className="flex flex-wrap gap-2 mb-2">
+        {newsItem.category && (
+          <span
+            className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded"
+            style={{ fontFamily: "var(--font-proba)" }}
+          >
+            📰 {newsItem.category}
+          </span>
+        )}
+        {newsItem.navigationCategory && (
+          <span
+            className="inline-block px-2 py-1 text-xs bg-green-100 text-green-700 rounded"
+            style={{ fontFamily: "var(--font-proba)" }}
+          >
+            🗂️ {newsItem.navigationCategory}
+          </span>
+        )}
+      </div>
+      <p
+        className="text-sm text-gray-700 line-clamp-3 mb-4"
+        style={{ fontFamily: "var(--font-proba)" }}
+      >
+        {newsItem.text}
+      </p>
+      <div className="flex gap-2 mt-auto pt-4 border-t border-gray-200">
+        <button
+          onClick={handleEdit}
+          className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+          style={{ fontFamily: "var(--font-proba)" }}
+        >
+          Редагувати
+        </button>
+        <button
+          onClick={handleDelete}
+          className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+          style={{ fontFamily: "var(--font-proba)" }}
+        >
+          Видалити
+        </button>
+      </div>
+    </div>
+  );
+});
+
+NewsCard.displayName = "NewsCard";
 
 export default function AdminNewsPage() {
   const [news, setNews] = useState<News[]>([]);
@@ -19,77 +115,98 @@ export default function AdminNewsPage() {
     image: null as string | null,
     date: new Date().toISOString().split("T")[0],
     text: "",
-    category: "", // Категорія для новин
-    navigationCategory: "", // Категорія для навігації
+    category: "",
+    navigationCategory: "",
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const ITEMS_PER_PAGE = 25;
 
-  useEffect(() => {
-    fetchNews();
-    fetchCategories();
-  }, []);
+  // Мемоізовані категорії для fallback
+  const defaultNewsCats = useMemo(() => [
+    "Прем'єр-міністр",
+    "Віце-прем'єр-міністр",
+    "Енергетика",
+    "Будівництво",
+    "Антикорупційна діяльність",
+    "Засідання Уряду",
+    "Надзвичайні ситуації",
+    "Соціальна політика",
+    "Економіка",
+    "Освіта",
+    "Охорона здоров'я",
+    "Транспорт",
+    "Сільське господарство",
+    "Екологія",
+    "Міжнародні відносини",
+  ], []);
 
-  const fetchCategories = async () => {
+  const defaultNavCats = useMemo(() => [
+    "Новини Парламенту",
+    "Виступи та коментарі",
+  ], []);
+
+  // Оптимізоване завантаження даних - паралельні запити
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      // Отримуємо категорії для новин
-      const newsCatResponse = await fetch("/api/categories?type=news_category");
-      const newsCatData = await newsCatResponse.json();
-      const newsCatNames = newsCatData.map((cat: { name: string }) => cat.name);
-      setNewsCategories(newsCatNames);
+      const [newsResponse, newsCatResponse, navCatResponse] = await Promise.all([
+        fetch(`/api/news?page=${currentPage}&limit=${ITEMS_PER_PAGE}&admin=true`),
+        fetch("/api/categories?type=news_category"),
+        fetch("/api/categories?type=news_navigation"),
+      ]);
 
-      // Отримуємо категорії для навігації
-      const navCatResponse = await fetch("/api/categories?type=news_navigation");
-      const navCatData = await navCatResponse.json();
-      const navCatNames = navCatData.map((cat: { name: string }) => cat.name);
-      setNavigationCategories(navCatNames);
+      // Обробка новин
+      const newsData = await newsResponse.json();
+      if (newsData.data && newsData.pagination) {
+        // З пагінацією
+        setNews(newsData.data);
+        setPagination(newsData.pagination);
+      } else {
+        // Без пагінації (fallback)
+        setNews(newsData);
+        setPagination(null);
+      }
+
+      // Обробка категорій
+      try {
+        const newsCatData = await newsCatResponse.json();
+        const newsCatNames = newsCatData.map((cat: { name: string }) => cat.name);
+        setNewsCategories(newsCatNames);
+      } catch (error) {
+        console.error("Error parsing news categories:", error);
+        setNewsCategories(defaultNewsCats);
+      }
+
+      try {
+        const navCatData = await navCatResponse.json();
+        const navCatNames = navCatData.map((cat: { name: string }) => cat.name);
+        setNavigationCategories(navCatNames);
+      } catch (error) {
+        console.error("Error parsing navigation categories:", error);
+        setNavigationCategories(defaultNavCats);
+      }
     } catch (error) {
-      console.error("Error fetching categories:", error);
-      // Fallback к дефолтным категориям
-      const defaultNewsCats = [
-        "Прем'єр-міністр",
-        "Віце-прем'єр-міністр",
-        "Енергетика",
-        "Будівництво",
-        "Антикорупційна діяльність",
-        "Засідання Уряду",
-        "Надзвичайні ситуації",
-        "Соціальна політика",
-        "Економіка",
-        "Освіта",
-        "Охорона здоров'я",
-        "Транспорт",
-        "Сільське господарство",
-        "Екологія",
-        "Міжнародні відносини",
-      ];
-      const defaultNavCats = [
-        "Новини Парламенту",
-        "Виступи та коментарі",
-      ];
+      console.error("Error fetching data:", error);
+      // Fallback до дефолтних категорій
       setNewsCategories(defaultNewsCats);
       setNavigationCategories(defaultNavCats);
-    }
-  };
-
-  const fetchNews = async () => {
-    try {
-      const response = await fetch("/api/news");
-      const data = await response.json();
-      setNews(data);
-    } catch (error) {
-      console.error("Error fetching news:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, defaultNewsCats, defaultNavCats]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Форматируем дату в ISO формат
       const dateISO = new Date(formData.date).toISOString();
 
       if (editingId) {
@@ -108,7 +225,7 @@ export default function AdminNewsPage() {
         });
 
         if (response.ok) {
-          await fetchNews();
+          await fetchData();
           resetForm();
         }
       } else {
@@ -126,7 +243,7 @@ export default function AdminNewsPage() {
         });
 
         if (response.ok) {
-          await fetchNews();
+          await fetchData();
           resetForm();
         }
       }
@@ -134,9 +251,9 @@ export default function AdminNewsPage() {
       console.error("Error saving news:", error);
       alert("Помилка при збереженні");
     }
-  };
+  }, [editingId, formData, fetchData]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Ви впевнені, що хочете видалити цю новину?")) return;
 
     try {
@@ -145,15 +262,15 @@ export default function AdminNewsPage() {
       });
 
       if (response.ok) {
-        await fetchNews();
+        await fetchData();
       }
     } catch (error) {
       console.error("Error deleting news:", error);
       alert("Помилка при видаленні");
     }
-  };
+  }, [fetchData]);
 
-  const handleEdit = (newsItem: News) => {
+  const handleEdit = useCallback((newsItem: News) => {
     setEditingId(newsItem.id);
     const dateStr = new Date(newsItem.date).toISOString().split("T")[0];
     setFormData({
@@ -166,9 +283,9 @@ export default function AdminNewsPage() {
     });
     setImagePreview(newsItem.image);
     setShowForm(true);
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEditingId(null);
     setFormData({
       title: "",
@@ -180,9 +297,9 @@ export default function AdminNewsPage() {
     });
     setImagePreview(null);
     setShowForm(false);
-  };
+  }, []);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -210,10 +327,13 @@ export default function AdminNewsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setFormData({ ...formData, image: data.path });
-        setImagePreview(data.path);
+        // Використовуємо dataUrl (base64) для збереження в базі даних
+        const imageData = data.dataUrl || data.path;
+        setFormData((prev) => ({ ...prev, image: imageData }));
+        setImagePreview(imageData);
       } else {
-        alert("Помилка при завантаженні файлу");
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Помилка при завантаженні файлу: ${errorData.error || "Невідома помилка"}`);
       }
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -221,7 +341,18 @@ export default function AdminNewsPage() {
     } finally {
       setUploadingImage(false);
     }
-  };
+  }, []);
+
+  // Мемоізований відсортований список новин
+  const sortedNews = useMemo(() => {
+    return [...news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [news]);
+
+  // Обробники пагінації
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   if (loading) {
     return (
@@ -322,11 +453,11 @@ export default function AdminNewsPage() {
                             Попередній перегляд:
                           </p>
                           <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-300">
-                            <Image
+                            <ImageDisplay
                               src={imagePreview || formData.image || ""}
                               alt="Попередній перегляд"
                               fill
-                              className="object-cover"
+                              objectFit="cover"
                             />
                           </div>
                         </div>
@@ -447,78 +578,76 @@ export default function AdminNewsPage() {
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {news
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .map((newsItem) => (
-                    <div
-                      key={newsItem.id}
-                      className="bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col"
-                    >
-                      {newsItem.image && (
-                        <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-                          <Image
-                            src={newsItem.image}
-                            alt={newsItem.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      )}
-                      <h3
-                        className="text-lg font-bold text-gray-900 mb-2 line-clamp-2"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        {newsItem.title}
-                      </h3>
-                      <p
-                        className="text-sm text-gray-600 mb-2"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        {new Date(newsItem.date).toLocaleDateString("uk-UA")}
-                      </p>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {newsItem.category && (
-                          <span
-                            className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded"
-                            style={{ fontFamily: "var(--font-proba)" }}
-                          >
-                            📰 {newsItem.category}
-                          </span>
-                        )}
-                        {newsItem.navigationCategory && (
-                          <span
-                            className="inline-block px-2 py-1 text-xs bg-green-100 text-green-700 rounded"
-                            style={{ fontFamily: "var(--font-proba)" }}
-                          >
-                            🗂️ {newsItem.navigationCategory}
-                          </span>
-                        )}
-                      </div>
-                      <p
-                        className="text-sm text-gray-700 line-clamp-3 mb-4"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        {newsItem.text}
-                      </p>
-                      <div className="flex gap-2 mt-auto pt-4 border-t border-gray-200">
-                        <button
-                          onClick={() => handleEdit(newsItem)}
-                          className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
-                          style={{ fontFamily: "var(--font-proba)" }}
-                        >
-                          Редагувати
-                        </button>
-                        <button
-                          onClick={() => handleDelete(newsItem.id)}
-                          className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
-                          style={{ fontFamily: "var(--font-proba)" }}
-                        >
-                          Видалити
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                {sortedNews.map((newsItem) => (
+                  <NewsCard
+                    key={newsItem.id}
+                    newsItem={newsItem}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
               </div>
+
+              {/* Пагінація */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="mt-8 flex justify-center items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Попередня
+                  </button>
+                  
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (pagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-4 py-2 rounded-lg ${
+                            currentPage === pageNum
+                              ? "bg-[#23527c] text-white"
+                              : "bg-white border border-gray-300 hover:bg-gray-50"
+                          }`}
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    Наступна
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {pagination && (
+                <div className="mt-4 text-center text-sm text-gray-600" style={{ fontFamily: "var(--font-proba)" }}>
+                  Сторінка {pagination.page} з {pagination.totalPages} (всього: {pagination.total})
+                </div>
+              )}
             </div>
           </div>
         </main>
@@ -527,4 +656,3 @@ export default function AdminNewsPage() {
     </AuthGuard>
   );
 }
-

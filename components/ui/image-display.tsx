@@ -32,13 +32,14 @@ export function ImageDisplay({
   const isBase64 = src.startsWith("data:image");
 
   if (isBase64) {
-    // Для base64 используем обычный img тег
+    // Для base64 используем обычный img тег з lazy loading
     if (fill) {
       return (
         <div className={`relative w-full h-full ${className}`} style={{ width: '100%', height: '100%' }}>
           <img
             src={src}
             alt={alt}
+            loading="lazy"
             style={{ 
               width: '100%', 
               height: '100%', 
@@ -58,6 +59,7 @@ export function ImageDisplay({
         height={height}
         className={className}
         style={{ objectFit }}
+        loading="lazy"
         onError={() => setError(true)}
       />
     );
@@ -83,6 +85,7 @@ export function ImageDisplay({
           style={{ objectFit }}
           onError={() => setError(true)}
           unoptimized={src.startsWith('/')}
+          loading="lazy"
         />
       </div>
     );
@@ -98,6 +101,7 @@ export function ImageDisplay({
       style={{ objectFit }}
       onError={() => setError(true)}
       unoptimized={src.startsWith('/') && !src.startsWith('/images')}
+      loading="lazy"
     />
   );
 }

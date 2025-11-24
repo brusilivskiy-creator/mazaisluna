@@ -1,8 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+
+    // Підтримка пагінації
+    if (page) {
+      const pageNum = parseInt(page) || 1;
+      const limitNum = limit ? parseInt(limit) : 25;
+      const skip = (pageNum - 1) * limitNum;
+
+      // Отримуємо загальну кількість для пагінації
+      const total = await prisma.leadership.count();
+
+      const leadership = await prisma.leadership.findMany({
+        include: {
+          politician: {
+            include: {
+              party: true,
+            },
+          },
+          position: true,
+        },
+        orderBy: {
+          position: {
+            order: 'asc',
+          },
+        },
+        skip,
+        take: limitNum,
+      });
+
+      // Форматируем для совместимости с фронтендом
+      const formatted = leadership.map((l) => ({
+        id: l.id,
+        politicianId: l.politicianId,
+        position: l.position.name,
+        name: l.politician.name,
+        image: l.politician.image,
+        party: l.politician.party?.name || null,
+        partyLogo: l.politician.party?.logo || null,
+      }));
+
+      return NextResponse.json({
+        data: formatted,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    }
+
+    // Без пагінації (для зворотної сумісності)
     const leadership = await prisma.leadership.findMany({
       include: {
         politician: {

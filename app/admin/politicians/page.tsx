@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { Politician } from "@/lib/politicians";
 import { Party } from "@/lib/parties";
 import { Header } from "@/components/layout/header";
@@ -8,6 +8,97 @@ import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
 import { ImageDisplay } from "@/components/ui/image-display";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+// Мемоізований компонент картки політика
+const PoliticianCard = memo(({ 
+  politician, 
+  onEdit, 
+  onDelete 
+}: { 
+  politician: Politician; 
+  onEdit: (item: Politician) => void;
+  onDelete: (id: number) => void;
+}) => {
+  const handleEdit = useCallback(() => {
+    onEdit(politician);
+  }, [politician, onEdit]);
+
+  const handleDelete = useCallback(() => {
+    onDelete(politician.id);
+  }, [politician.id, onDelete]);
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col">
+      <div className="flex-1 mb-4">
+        {politician.image && (
+          <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 mb-3 bg-gray-100">
+            <ImageDisplay
+              src={politician.image}
+              alt={politician.name}
+              fill
+              objectFit="cover"
+            />
+          </div>
+        )}
+        <h3
+          className="text-lg font-bold text-gray-900 mb-2"
+          style={{ fontFamily: "var(--font-proba)" }}
+        >
+          {politician.name}
+        </h3>
+        {politician.party && (
+          <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+            {politician.partyLogo && (
+              <div className="relative w-6 h-6 flex-shrink-0 rounded overflow-hidden bg-white border border-gray-200">
+                <ImageDisplay
+                  src={politician.partyLogo}
+                  alt={politician.party}
+                  width={24}
+                  height={24}
+                  objectFit="contain"
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
+            )}
+            <p
+              className="text-xs text-gray-600"
+              style={{ fontFamily: "var(--font-proba)" }}
+            >
+              {politician.party}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-2 mt-auto pt-4 border-t border-gray-200">
+        <button
+          onClick={handleEdit}
+          className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+          style={{ fontFamily: "var(--font-proba)" }}
+        >
+          Редагувати
+        </button>
+        <button
+          onClick={handleDelete}
+          className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+          style={{ fontFamily: "var(--font-proba)" }}
+        >
+          Видалити
+        </button>
+      </div>
+    </div>
+  );
+});
+
+PoliticianCard.displayName = "PoliticianCard";
 
 export default function AdminPoliticiansPage() {
   const [politicians, setPoliticians] = useState<Politician[]>([]);
@@ -23,39 +114,53 @@ export default function AdminPoliticiansPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const ITEMS_PER_PAGE = 25;
 
-  useEffect(() => {
-    fetchPoliticians();
-    fetchParties();
-  }, []);
-
-  const fetchParties = async () => {
+  // Оптимізоване завантаження даних - паралельні запити
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/parties");
-      const data = await response.json();
-      setParties(data);
-    } catch (error) {
-      console.error("Error fetching parties:", error);
-    }
-  };
+      const [politiciansResponse, partiesResponse] = await Promise.all([
+        fetch(`/api/politicians?page=${currentPage}&limit=${ITEMS_PER_PAGE}`),
+        fetch("/api/parties"),
+      ]);
 
-  const fetchPoliticians = async () => {
-    try {
-      const response = await fetch("/api/politicians");
-      const data = await response.json();
-      setPoliticians(data);
+      // Обробка політиків
+      const politiciansData = await politiciansResponse.json();
+      if (politiciansData.data && politiciansData.pagination) {
+        // З пагінацією
+        setPoliticians(politiciansData.data);
+        setPagination(politiciansData.pagination);
+      } else {
+        // Без пагінації (fallback)
+        setPoliticians(politiciansData);
+        setPagination(null);
+      }
+
+      // Обробка партій
+      const partiesData = await partiesResponse.json();
+      if (partiesData.data) {
+        setParties(partiesData.data);
+      } else {
+        setParties(partiesData);
+      }
     } catch (error) {
-      console.error("Error fetching politicians:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Находим ID партии по имени
       const selectedParty = parties.find((p) => p.name === formData.party);
       const partyId = selectedParty?.id || null;
 
@@ -74,8 +179,6 @@ export default function AdminPoliticiansPage() {
         payload.id = editingId;
       }
 
-      console.log("Submitting politician:", payload);
-
       const response = await fetch("/api/politicians", {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,22 +188,20 @@ export default function AdminPoliticiansPage() {
       const responseData = await response.json();
 
       if (!response.ok) {
-        console.error("Error response:", responseData);
         alert(`Помилка при збереженні: ${responseData.error || "Невідома помилка"}`);
         return;
       }
 
-      console.log("Success response:", responseData);
-      await fetchPoliticians();
+      await fetchData();
       resetForm();
       alert(editingId ? "Політика оновлено" : "Політика додано");
     } catch (error) {
       console.error("Error saving politician:", error);
       alert("Помилка при збереженні: " + (error instanceof Error ? error.message : "Невідома помилка"));
     }
-  };
+  }, [editingId, formData, parties, fetchData]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Ви впевнені, що хочете видалити цього політика?")) return;
 
     try {
@@ -109,15 +210,15 @@ export default function AdminPoliticiansPage() {
       });
 
       if (response.ok) {
-        await fetchPoliticians();
+        await fetchData();
       }
     } catch (error) {
       console.error("Error deleting politician:", error);
       alert("Помилка при видаленні");
     }
-  };
+  }, [fetchData]);
 
-  const handleEdit = (politician: Politician) => {
+  const handleEdit = useCallback((politician: Politician) => {
     setEditingId(politician.id);
     setFormData({
       name: politician.name,
@@ -127,36 +228,34 @@ export default function AdminPoliticiansPage() {
     });
     setImagePreview(politician.image || null);
     setShowForm(true);
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEditingId(null);
     setFormData({ name: "", image: "", party: "", partyLogo: "" });
     setImagePreview(null);
     setShowForm(false);
-  };
+  }, []);
 
-  const handlePartyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePartyChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const partyName = e.target.value;
     const selectedParty = parties.find((p) => p.name === partyName);
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       party: partyName,
       partyLogo: selectedParty?.logo || "",
-    });
-  };
+    }));
+  }, [parties]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Перевірка типу файлу
     if (!file.type.startsWith("image/")) {
       alert("Будь ласка, виберіть файл зображення");
       return;
     }
 
-    // Перевірка розміру файлу (макс 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("Розмір файлу не повинен перевищувати 5MB");
       return;
@@ -177,31 +276,31 @@ export default function AdminPoliticiansPage() {
       const responseData = await response.json();
 
       if (!response.ok) {
-        console.error("Upload error response:", responseData);
         alert(`Помилка при завантаженні файлу: ${responseData.error || "Невідома помилка"}`);
         return;
       }
 
-      if (responseData.success && responseData.dataUrl) {
-        console.log("Upload successful:", responseData.path);
-        // Используем dataUrl (base64) для сохранения в базе данных
-        setFormData({ ...formData, image: responseData.dataUrl });
-        setImagePreview(responseData.dataUrl);
-      } else if (responseData.success && responseData.path) {
-        // Fallback для обратной совместимости
-        console.log("Upload successful (legacy):", responseData.path);
-        setFormData({ ...formData, image: responseData.path });
-        setImagePreview(responseData.path);
-      } else {
-        alert("Помилка: некоректна відповідь від сервера");
-      }
+      const imageData = responseData.dataUrl || responseData.path;
+      setFormData((prev) => ({ ...prev, image: imageData }));
+      setImagePreview(imageData);
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Помилка при завантаженні файлу");
     } finally {
       setUploadingImage(false);
     }
-  };
+  }, []);
+
+  // Мемоізований список політиків
+  const sortedPoliticians = useMemo(() => {
+    return [...politicians].sort((a, b) => a.id - b.id);
+  }, [politicians]);
+
+  // Обробники пагінації
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   if (loading) {
     return (
@@ -357,71 +456,76 @@ export default function AdminPoliticiansPage() {
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {politicians.map((politician) => (
-                  <div
+                {sortedPoliticians.map((politician) => (
+                  <PoliticianCard
                     key={politician.id}
-                    className="bg-white p-6 rounded-lg shadow-md border border-gray-300 flex flex-col"
-                  >
-                    <div className="flex-1 mb-4">
-                      {politician.image && (
-                        <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 mb-3">
-                          <ImageDisplay
-                            src={politician.image}
-                            alt={politician.name}
-                            fill
-                            objectFit="cover"
-                          />
-                        </div>
-                      )}
-                      <h3
-                        className="text-lg font-bold text-gray-900 mb-2"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        {politician.name}
-                      </h3>
-                      {politician.party && (
-                        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
-                          {politician.partyLogo && (
-                            <div className="relative w-6 h-6 flex-shrink-0 rounded overflow-hidden bg-white border border-gray-200">
-                              <ImageDisplay
-                                src={politician.partyLogo}
-                                alt={politician.party}
-                                width={24}
-                                height={24}
-                                objectFit="contain"
-                                className="w-full h-full object-contain p-0.5"
-                              />
-                            </div>
-                          )}
-                          <p
-                            className="text-xs text-gray-600"
-                            style={{ fontFamily: "var(--font-proba)" }}
-                          >
-                            {politician.party}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2 mt-auto pt-4 border-t border-gray-200">
-                      <button
-                        onClick={() => handleEdit(politician)}
-                        className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        Редагувати
-                      </button>
-                      <button
-                        onClick={() => handleDelete(politician.id)}
-                        className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        Видалити
-                      </button>
-                    </div>
-                  </div>
+                    politician={politician}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </div>
+
+              {/* Пагінація */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="mt-8 flex justify-center items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Попередня
+                  </button>
+                  
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (pagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-4 py-2 rounded-lg ${
+                            currentPage === pageNum
+                              ? "bg-[#23527c] text-white"
+                              : "bg-white border border-gray-300 hover:bg-gray-50"
+                          }`}
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                    style={{ fontFamily: "var(--font-proba)" }}
+                  >
+                    Наступна
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {pagination && (
+                <div className="mt-4 text-center text-sm text-gray-600" style={{ fontFamily: "var(--font-proba)" }}>
+                  Сторінка {pagination.page} з {pagination.totalPages} (всього: {pagination.total})
+                </div>
+              )}
             </div>
           </div>
         </main>
@@ -430,4 +534,3 @@ export default function AdminPoliticiansPage() {
     </AuthGuard>
   );
 }
-

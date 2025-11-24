@@ -1,8 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+
+    // Підтримка пагінації
+    if (page) {
+      const pageNum = parseInt(page) || 1;
+      const limitNum = limit ? parseInt(limit) : 25;
+      const skip = (pageNum - 1) * limitNum;
+
+      // Отримуємо загальну кількість для пагінації
+      const total = await prisma.politician.count();
+
+      const politicians = await prisma.politician.findMany({
+        include: {
+          party: true,
+        },
+        orderBy: {
+          id: 'asc',
+        },
+        skip,
+        take: limitNum,
+      });
+
+      // Форматируем для совместимости с фронтендом
+      const formatted = politicians.map((p) => ({
+        id: p.id,
+        name: p.name,
+        image: p.image,
+        party: p.party?.name || null,
+        partyLogo: p.party?.logo || null,
+      }));
+
+      return NextResponse.json({
+        data: formatted,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    }
+
+    // Без пагінації (для зворотної сумісності)
     const politicians = await prisma.politician.findMany({
       include: {
         party: true,
