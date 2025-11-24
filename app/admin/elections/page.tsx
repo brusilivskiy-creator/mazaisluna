@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ElectionsData, ParliamentElection, LeaderElection } from "@/lib/elections";
 import { Party } from "@/lib/parties";
 import { Politician } from "@/lib/politicians";
@@ -8,7 +8,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthGuard } from "@/components/admin/auth-guard";
 import Link from "next/link";
-import Image from "next/image";
+import { ImageDisplay } from "@/components/ui/image-display";
 
 export default function AdminElectionsPage() {
   const [elections, setElections] = useState<ElectionsData | null>(null);
@@ -36,11 +36,34 @@ export default function AdminElectionsPage() {
     candidates: [] as { candidateId: number | null; candidateName: string; percentage: number }[],
   });
 
-  useEffect(() => {
-    fetchElections();
-    fetchParties();
-    fetchPoliticians();
+  // Оптимізоване завантаження даних - паралельні запити
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [electionsResponse, partiesResponse, politiciansResponse] = await Promise.all([
+        fetch("/api/elections"),
+        fetch("/api/parties"),
+        fetch("/api/politicians"),
+      ]);
+
+      const electionsData = await electionsResponse.json();
+      setElections(electionsData);
+
+      const partiesData = await partiesResponse.json();
+      setParties(partiesData.data || partiesData);
+
+      const politiciansData = await politiciansResponse.json();
+      setPoliticians(politiciansData.data || politiciansData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     if (elections) {
@@ -96,39 +119,7 @@ export default function AdminElectionsPage() {
     }
   }, [elections]);
 
-  const fetchElections = async () => {
-    try {
-      const response = await fetch("/api/elections");
-      const data = await response.json();
-      setElections(data);
-    } catch (error) {
-      console.error("Error fetching elections:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchParties = async () => {
-    try {
-      const response = await fetch("/api/parties");
-      const data = await response.json();
-      setParties(data);
-    } catch (error) {
-      console.error("Error fetching parties:", error);
-    }
-  };
-
-  const fetchPoliticians = async () => {
-    try {
-      const response = await fetch("/api/politicians");
-      const data = await response.json();
-      setPoliticians(data);
-    } catch (error) {
-      console.error("Error fetching politicians:", error);
-    }
-  };
-
-  const handleParliamentSubmit = async (e: React.FormEvent) => {
+  const handleParliamentSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     const parliamentElection: ParliamentElection = {
@@ -149,16 +140,16 @@ export default function AdminElectionsPage() {
       });
 
       if (response.ok) {
-        await fetchElections();
+        await fetchData();
         alert("Парламентські вибори оновлено");
       }
     } catch (error) {
       console.error("Error saving parliament election:", error);
       alert("Помилка при збереженні");
     }
-  };
+  }, [parliamentForm, elections, fetchData]);
 
-  const handleLeaderSubmit = async (e: React.FormEvent) => {
+  const handleLeaderSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     const leaderElection: LeaderElection = {
@@ -178,16 +169,16 @@ export default function AdminElectionsPage() {
       });
 
       if (response.ok) {
-        await fetchElections();
+        await fetchData();
         alert("Вибори Провідника оновлено");
       }
     } catch (error) {
       console.error("Error saving leader election:", error);
       alert("Помилка при збереженні");
     }
-  };
+  }, [leaderForm, elections, fetchData]);
 
-  const addParliamentParty = () => {
+  const addParliamentParty = useCallback(() => {
     setParliamentForm({
       ...parliamentForm,
       parties: [
@@ -195,16 +186,16 @@ export default function AdminElectionsPage() {
         { partyId: 0, partyName: "", percentage: 0 },
       ],
     });
-  };
+  }, [parliamentForm]);
 
-  const removeParliamentParty = (index: number) => {
+  const removeParliamentParty = useCallback((index: number) => {
     setParliamentForm({
       ...parliamentForm,
       parties: parliamentForm.parties.filter((_, i) => i !== index),
     });
-  };
+  }, [parliamentForm]);
 
-  const updateParliamentParty = (index: number, field: string, value: any) => {
+  const updateParliamentParty = useCallback((index: number, field: string, value: any) => {
     const newParties = [...parliamentForm.parties];
     if (field === "partyId") {
       const party = parties.find((p) => p.id === parseInt(value));
@@ -217,9 +208,9 @@ export default function AdminElectionsPage() {
       newParties[index] = { ...newParties[index], [field]: value };
     }
     setParliamentForm({ ...parliamentForm, parties: newParties });
-  };
+  }, [parliamentForm, parties]);
 
-  const updateMajoritarianDistrict = (
+  const updateMajoritarianDistrict = useCallback((
     districtIndex: number,
     field: string,
     value: any
@@ -243,9 +234,9 @@ export default function AdminElectionsPage() {
       newDistricts[districtIndex] = { ...newDistricts[districtIndex], [field]: value };
     }
     setParliamentForm({ ...parliamentForm, majoritarianDistricts: newDistricts });
-  };
+  }, [parliamentForm, parties, politicians]);
 
-  const addLeaderCandidate = () => {
+  const addLeaderCandidate = useCallback(() => {
     setLeaderForm({
       ...leaderForm,
       candidates: [
@@ -253,16 +244,16 @@ export default function AdminElectionsPage() {
         { candidateId: null, candidateName: "", percentage: 0 },
       ],
     });
-  };
+  }, [leaderForm]);
 
-  const removeLeaderCandidate = (index: number) => {
+  const removeLeaderCandidate = useCallback((index: number) => {
     setLeaderForm({
       ...leaderForm,
       candidates: leaderForm.candidates.filter((_, i) => i !== index),
     });
-  };
+  }, [leaderForm]);
 
-  const updateLeaderCandidate = (index: number, field: string, value: any) => {
+  const updateLeaderCandidate = useCallback((index: number, field: string, value: any) => {
     const newCandidates = [...leaderForm.candidates];
     if (field === "candidateId") {
       const politician = politicians.find((p) => p.id === parseInt(value));
@@ -275,7 +266,7 @@ export default function AdminElectionsPage() {
       newCandidates[index] = { ...newCandidates[index], [field]: value };
     }
     setLeaderForm({ ...leaderForm, candidates: newCandidates });
-  };
+  }, [leaderForm, politicians]);
 
   if (loading) {
     return (
