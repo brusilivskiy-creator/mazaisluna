@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ParliamentSection } from "@/sections/parliament";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default async function ParliamentPage() {
+export default function ParliamentPage() {
   return (
     <>
       <Header />
@@ -10,7 +12,9 @@ export default async function ParliamentPage() {
         <main className="bg-white min-h-screen w-full">
           <section className="py-fluid-lg">
             <div className="content-wrapper">
-              <ParliamentSection />
+              <Suspense fallback={<LoadingSpinner />}>
+                <ParliamentSection />
+              </Suspense>
             </div>
           </section>
         </main>
