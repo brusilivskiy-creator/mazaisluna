@@ -33,6 +33,14 @@ export function ImageDisplay({
 
   if (isBase64) {
     // Для base64 используем обычный img тег з lazy loading
+    if (error) {
+      return (
+        <div className={`bg-gray-200 flex items-center justify-center ${className}`} style={{ width: width || 800, height: height || 600, minHeight: 200 }}>
+          <span className="text-gray-400 text-sm">Помилка завантаження</span>
+        </div>
+      );
+    }
+    
     if (fill) {
       return (
         <div className={`relative w-full h-full ${className}`} style={{ width: '100%', height: '100%' }}>
@@ -47,6 +55,7 @@ export function ImageDisplay({
               display: 'block'
             }}
             onError={() => setError(true)}
+            onLoad={() => setError(false)}
           />
         </div>
       );
@@ -58,9 +67,10 @@ export function ImageDisplay({
         width={width}
         height={height}
         className={className}
-        style={{ objectFit }}
+        style={{ objectFit, maxWidth: '100%', height: 'auto' }}
         loading="lazy"
         onError={() => setError(true)}
+        onLoad={() => setError(false)}
       />
     );
   }

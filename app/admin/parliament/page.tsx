@@ -30,6 +30,8 @@ export default function AdminParliamentPage() {
   const [showForm, setShowForm] = useState(false);
   const [parliamentDiagram, setParliamentDiagram] = useState<string | null>(null);
   const [uploadingDiagram, setUploadingDiagram] = useState(false);
+  const [diagramPreview, setDiagramPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Оптимізоване завантаження даних - паралельні запити
   const fetchData = useCallback(async () => {
@@ -145,61 +147,82 @@ export default function AdminParliamentPage() {
     setShowForm(false);
   }, []);
 
-  const handleDiagramUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDiagramPreview = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      setDiagramPreview(null);
+      setSelectedFile(null);
+      return;
+    }
 
     // Перевірка типу файлу
     if (!file.type.startsWith("image/")) {
       alert("Будь ласка, виберіть файл зображення");
+      setDiagramPreview(null);
+      setSelectedFile(null);
       return;
     }
 
     // Перевірка розміру файлу (макс 10MB)
     if (file.size > 10 * 1024 * 1024) {
       alert("Розмір файлу не повинен перевищувати 10MB");
+      setDiagramPreview(null);
+      setSelectedFile(null);
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Создаем preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setDiagramPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleDiagramUpload = useCallback(async () => {
+    if (!selectedFile && !diagramPreview) {
+      alert("Будь ласка, виберіть файл зображення");
+      return;
+    }
+
+    if (!diagramPreview) {
+      alert("Будь ласка, виберіть файл зображення");
       return;
     }
 
     setUploadingDiagram(true);
 
     try {
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-      uploadFormData.append("type", "parliament");
+      // Используем preview (уже base64) для сохранения
+      const diagramData = diagramPreview;
 
-      const uploadResponse = await fetch("/api/upload", {
-        method: "POST",
-        body: uploadFormData,
+      // Зберігаємо діаграму
+      const saveResponse = await fetch("/api/parliament", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ diagram: diagramData }),
       });
 
-      if (uploadResponse.ok) {
-        const uploadData = await uploadResponse.json();
-        
-        // Зберігаємо шлях до діаграми
-        const saveResponse = await fetch("/api/parliament", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ diagram: uploadData.path }),
-        });
-
-        if (saveResponse.ok) {
-          const savedData = await saveResponse.json();
-          setParliamentDiagram(savedData.diagram);
-          alert("Діаграму успішно завантажено!");
-        } else {
-          alert("Помилка при збереженні діаграми");
-        }
+      if (saveResponse.ok) {
+        const savedData = await saveResponse.json();
+        setParliamentDiagram(savedData.diagram);
+        setDiagramPreview(null);
+        setSelectedFile(null);
+        alert("Діаграму успішно завантажено!");
+        await fetchData();
       } else {
-        alert("Помилка при завантаженні файлу");
+        const errorData = await saveResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || "Помилка при збереженні діаграми");
       }
     } catch (error) {
       console.error("Error uploading diagram:", error);
-      alert("Помилка при завантаженні файлу");
+      alert(error instanceof Error ? error.message : "Помилка при завантаженні файлу");
     } finally {
       setUploadingDiagram(false);
     }
-  }, []);
+  }, [selectedFile, diagramPreview, fetchData]);
 
   const handleRemoveDiagram = useCallback(async () => {
     if (!confirm("Ви впевнені, що хочете видалити діаграму?")) return;
@@ -213,7 +236,10 @@ export default function AdminParliamentPage() {
 
       if (response.ok) {
         setParliamentDiagram(null);
+        setDiagramPreview(null);
+        setSelectedFile(null);
         alert("Діаграму видалено");
+        await fetchData();
       } else {
         alert("Помилка при видаленні діаграми");
       }
@@ -221,7 +247,7 @@ export default function AdminParliamentPage() {
       console.error("Error removing diagram:", error);
       alert("Помилка при видаленні діаграми");
     }
-  }, []);
+  }, [fetchData]);
 
   if (loading) {
     return (
@@ -279,22 +305,33 @@ export default function AdminParliamentPage() {
                   Діаграма парламенту
                 </h2>
                 <div className="space-y-4">
-                  {parliamentDiagram && (
+                  {/* Показываем текущую диаграмму или preview */}
+                  {(parliamentDiagram || diagramPreview) && (
                     <div className="relative">
                       <ImageDisplay
-                        src={parliamentDiagram}
+                        src={diagramPreview || parliamentDiagram || null}
                         alt="Діаграма парламенту"
                         width={800}
                         height={600}
                         className="w-full h-auto rounded-lg border border-gray-300"
+                        objectFit="contain"
                       />
-                      <button
-                        onClick={handleRemoveDiagram}
-                        className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
-                        style={{ fontFamily: "var(--font-proba)" }}
-                      >
-                        Видалити діаграму
-                      </button>
+                      {parliamentDiagram && !diagramPreview && (
+                        <button
+                          onClick={handleRemoveDiagram}
+                          className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                          style={{ fontFamily: "var(--font-proba)" }}
+                        >
+                          Видалити діаграму
+                        </button>
+                      )}
+                      {diagramPreview && (
+                        <div className="mt-2 flex gap-2">
+                          <span className="text-sm text-gray-600" style={{ fontFamily: "var(--font-proba)" }}>
+                            Попередній перегляд
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                   <div>
@@ -307,14 +344,24 @@ export default function AdminParliamentPage() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleDiagramUpload}
+                      onChange={handleDiagramPreview}
                       disabled={uploadingDiagram}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23527c] focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23527c] focus:border-transparent mb-2"
                       style={{ fontFamily: "var(--font-proba)" }}
                     />
-                    {uploadingDiagram && (
-                      <p className="mt-2 text-sm text-gray-600" style={{ fontFamily: "var(--font-proba)" }}>
-                        Завантаження...
+                    {diagramPreview && (
+                      <button
+                        onClick={handleDiagramUpload}
+                        disabled={uploadingDiagram}
+                        className="px-6 py-2 bg-[#23527c] text-white rounded-lg hover:bg-[#1a3d5c] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                        style={{ fontFamily: "var(--font-proba)" }}
+                      >
+                        {uploadingDiagram ? "Завантаження..." : "Зберегти діаграму"}
+                      </button>
+                    )}
+                    {!diagramPreview && !parliamentDiagram && (
+                      <p className="text-sm text-gray-500 mt-2" style={{ fontFamily: "var(--font-proba)" }}>
+                        Виберіть файл для попереднього перегляду
                       </p>
                     )}
                   </div>

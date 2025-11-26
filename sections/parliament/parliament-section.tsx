@@ -3,23 +3,24 @@ import { prisma } from "@/lib/prisma";
 
 export async function ParliamentSection() {
   try {
-    // Fetch data from database using Prisma
-    const partiesData = await prisma.party.findMany({
-      where: {
-        seats: {
-          gt: 0,
+    // Parallel fetching for better performance
+    const [partiesData, parliamentData] = await Promise.all([
+      prisma.party.findMany({
+        where: {
+          seats: {
+            gt: 0,
+          },
         },
-      },
-      orderBy: {
-        id: 'asc',
-      },
-    });
-
-    const parliamentData = await prisma.parliament.findFirst({
-      orderBy: {
-        date: 'desc',
-      },
-    });
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+      prisma.parliament.findFirst({
+        orderBy: {
+          date: 'desc',
+        },
+      }),
+    ]);
 
     // Filter only parties with seats > 0 for parliament display
     const parties = partiesData;
@@ -36,18 +37,18 @@ export async function ParliamentSection() {
           </h2>
 
           {/* Діаграма парламенту */}
-          {parliamentDiagram && (
+          {parliamentDiagram && parliamentDiagram.trim() !== "" ? (
             <div className="mb-fluid-md flex-shrink-0">
               <ImageDisplay
                 src={parliamentDiagram}
                 alt="Діаграма складу парламенту"
                 width={800}
                 height={600}
-                className="w-full h-auto rounded-lg"
+                className="w-full h-auto rounded-lg border border-gray-200"
                 objectFit="contain"
               />
             </div>
-          )}
+          ) : null}
 
           {/* Список партий */}
           <div className="auto-grid flex-1 min-h-0 content-start gap-fluid-sm" style={{'--min-column-width': '280px'} as React.CSSProperties}>
